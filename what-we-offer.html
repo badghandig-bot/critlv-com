@@ -1,0 +1,1645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CRIT — What We Offer · Reference Install</title>
+<meta name="description" content="What a CRIT install actually looks like — packages, reference floorplan, coverage layers, timeline and deliverables."/>
+<link rel="canonical" href="https://critlv.com/what-we-offer.html"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #06101F;
+  --bg-2: #0A1628;
+  --bg-3: #0F1E36;
+  --line: rgba(123, 230, 240, 0.12);
+  --line-strong: rgba(123, 230, 240, 0.28);
+  --ink: #E8EEF5;
+  --ink-2: #A9BACB;
+  --ink-3: #6B829A;
+  --cyan: #7BE6F0;
+  --cyan-deep: #2BC0CF;
+  --amber: #F2C84B;
+  --amber-deep: #D9A828;
+  --danger: #F26B4B;
+  --max: 1320px;
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 18px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.container {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-feature-settings: "ss01" on, "cv01" on;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: "";
+  width: 22px; height: 1px;
+  background: var(--cyan);
+  display: inline-block;
+}
+h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+p { margin: 0; }
+
+/* ========= NAV ========= */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(14px);
+  background: rgba(6, 16, 31, 0.72);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.brand-mark {
+  width: 36px; height: 36px;
+  position: relative;
+}
+.brand-mark svg { width: 100%; height: 100%; display: block; }
+.brand-text { font-size: 16px; }
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a {
+  font-size: 14px;
+  color: var(--ink-2);
+  transition: color .15s;
+  position: relative;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links a.active { color: var(--cyan); }
+
+.nav-toggle { display: none; background: transparent; border: 1px solid var(--line-strong); color: var(--ink); border-radius: var(--r-sm); width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+.nav-toggle:hover { border-color: var(--cyan); color: var(--cyan); }
+.nav-toggle .ic-close { display: none; }
+body.nav-open .nav-toggle .ic-menu { display: none; }
+body.nav-open .nav-toggle .ic-close { display: block; }
+
+/* ========= BUTTONS ========= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.01em;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform .15s, background .15s, border-color .15s, color .15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--cyan);
+  color: #042029;
+  border-color: var(--cyan);
+}
+.btn-primary:hover { background: #95edf6; transform: translateY(-1px); }
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+.btn .arrow { transition: transform .2s; }
+.btn:hover .arrow { transform: translateX(3px); }
+
+/* ========= SECTIONS ========= */
+section { position: relative; }
+.section {
+  padding: 120px 0;
+  position: relative;
+}
+.section-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: end;
+  margin-bottom: 64px;
+}
+.section-head h2 {
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1.02;
+}
+.section-head p {
+  color: var(--ink-2);
+  font-size: 17px;
+  max-width: 520px;
+}
+
+/* ========= STATUS PILL ========= */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  padding: 6px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(123, 230, 240, 0.04);
+}
+.pill .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(123, 230, 240, 0.15);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; box-shadow: 0 0 0 3px rgba(123, 230, 240, 0.15); }
+  50% { opacity: .65; box-shadow: 0 0 0 6px rgba(123, 230, 240, 0.05); }
+}
+
+/* ========= CONTACT FORM ========= */
+.contact-form { display: grid; gap: 14px; }
+.input, .textarea, .select {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 14px 16px;
+  border-radius: var(--r-sm);
+  width: 100%;
+  transition: border-color .15s;
+}
+.input:focus, .textarea:focus, .select:focus { outline: none; border-color: var(--cyan); }
+.textarea { resize: vertical; min-height: 110px; font-family: inherit; }
+.label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* ========= CTA ========= */
+.cta {
+  border-top: 1px solid var(--line);
+  padding: 120px 0;
+  position: relative;
+  overflow: hidden;
+}
+.cta-inner {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.cta h2 {
+  font-size: clamp(40px, 5vw, 68px);
+  line-height: 1.02;
+}
+.cta-card {
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  padding: 32px;
+  border-radius: var(--r-lg);
+}
+.cta-card-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 14px;
+}
+.cta-card-row:last-child { border-bottom: 0; }
+.cta-card-row .ic {
+  width: 36px; height: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cyan);
+  flex-shrink: 0;
+}
+.cta-card-row .label-i {
+  color: var(--ink-3);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.cta-card-row .val { color: var(--ink); }
+
+/* ========= FOOTER ========= */
+footer {
+  background: var(--bg-2);
+  border-top: 1px solid var(--line);
+  padding: 64px 0 32px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 56px;
+}
+.footer-col h5 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+.footer-col a {
+  display: block;
+  color: var(--ink-2);
+  font-size: 14px;
+  padding: 4px 0;
+  transition: color .15s;
+}
+.footer-col a:hover { color: var(--cyan); }
+.footer-bot {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+}
+
+/* ========= OFFER HERO ========= */
+.offer-hero {
+  padding: 56px 0 80px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+}
+.offer-hero h1 {
+  font-size: clamp(40px, 5.5vw, 72px);
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin: 22px 0 24px;
+  max-width: 880px;
+}
+.offer-hero h1 em {
+  font-style: normal;
+  color: var(--cyan);
+}
+.offer-hero p {
+  color: var(--ink-2);
+  font-size: 18px;
+  max-width: 640px;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  opacity: .55;
+}
+
+/* ========= TIERS ========= */
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 32px;
+}
+.tier {
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  border-radius: var(--r-lg);
+  padding: 32px 28px;
+  position: relative;
+  transition: border-color .2s, transform .2s;
+  display: flex;
+  flex-direction: column;
+}
+.tier:hover { border-color: var(--cyan); transform: translateY(-3px); }
+.tier.featured { border-color: var(--cyan-deep); }
+.tier-badge {
+  position: absolute;
+  top: -10px; left: 24px;
+  background: var(--cyan);
+  color: #042029;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+.tier-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.14em;
+  margin-bottom: 16px;
+}
+.tier h3 { font-size: 24px; margin-bottom: 6px; }
+.tier-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  letter-spacing: 0.1em;
+  margin-bottom: 22px;
+  text-transform: uppercase;
+}
+.tier-meta {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.tier-meta-item .k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+.tier-meta-item .v {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17px;
+  color: var(--ink);
+  margin-top: 2px;
+}
+.tier ul { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
+.tier ul li {
+  padding: 8px 0 8px 22px;
+  font-size: 14px;
+  color: var(--ink-2);
+  position: relative;
+  border-bottom: 1px dashed var(--line);
+}
+.tier ul li:last-child { border-bottom: 0; }
+.tier ul li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 14px;
+  width: 10px; height: 10px;
+  border: 1px solid var(--cyan);
+  transform: rotate(45deg);
+}
+
+/* ========= DIAGRAM ========= */
+.diagram-wrap {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  position: relative;
+}
+.diagram-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--bg-3);
+}
+.diagram-toggles { display: flex; gap: 6px; }
+.toggle-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s;
+}
+.toggle-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+.toggle-btn.on { color: #042029; background: var(--cyan); border-color: var(--cyan); }
+.toggle-btn .swatch {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+}
+.diagram-svg {
+  width: 100%;
+  display: block;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(123,230,240,0.04), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(242,200,75,0.04), transparent 50%),
+    var(--bg-2);
+}
+.diagram-legend {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+.legend-item {
+  padding: 14px 16px;
+  border-right: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.legend-item:last-child { border-right: 0; }
+.legend-item .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-item .name { font-size: 13px; color: var(--ink); }
+.legend-item .count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-left: auto;
+  letter-spacing: 0.1em;
+}
+
+/* ========= COVERAGE ========= */
+.coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.zone-card {
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  padding: 28px;
+  border-radius: var(--r-lg);
+  position: relative;
+}
+.zone-card .zone-vis { width: 100%; height: 140px; margin-bottom: 18px; }
+.zone-card h4 { font-size: 18px; margin-bottom: 6px; }
+.zone-card p { color: var(--ink-2); font-size: 13.5px; line-height: 1.55; }
+.zone-card .specs { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.zone-card .spec {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--cyan);
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+/* ========= DELIVERABLES ========= */
+.deliverables {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.deliverable {
+  background: var(--bg-2);
+  padding: 28px;
+  display: flex;
+  gap: 18px;
+}
+.deliverable .ic {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cyan);
+  background: rgba(123, 230, 240, 0.04);
+}
+.deliverable h4 { font-size: 17px; margin-bottom: 6px; }
+.deliverable p { color: var(--ink-2); font-size: 14px; }
+
+/* ========= TIMELINE ========= */
+.timeline {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 0;
+  border-left: 1px solid var(--line);
+  padding-left: 0;
+  position: relative;
+  margin-top: 16px;
+}
+.tl-row { display: contents; }
+.tl-week {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  letter-spacing: 0.1em;
+  padding: 18px 16px 18px 18px;
+  border-bottom: 1px dashed var(--line);
+  position: relative;
+}
+.tl-week::before {
+  content: "";
+  position: absolute;
+  left: -5px; top: 24px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(123, 230, 240, 0.15);
+}
+.tl-content { padding: 18px 0; border-bottom: 1px dashed var(--line); }
+.tl-content h5 { font-size: 16px; margin: 0 0 4px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+.tl-content p { color: var(--ink-2); font-size: 13.5px; }
+.tl-row:last-child .tl-week,
+.tl-row:last-child .tl-content { border-bottom: 0; }
+
+/* ========= SUBNAV ========= */
+.subnav {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 72px;
+  z-index: 40;
+  backdrop-filter: blur(14px);
+}
+.subnav-inner {
+  display: flex;
+  gap: 4px;
+  height: 56px;
+  align-items: center;
+  overflow-x: auto;
+}
+.subnav a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.subnav a:hover { color: var(--ink); }
+.subnav a.active { color: var(--cyan); border-color: var(--line-strong); }
+
+/* ========= DIAGRAM SCROLL WRAPPER ========= */
+.diagram-svg-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ========= RESPONSIVE ========= */
+@media (max-width: 980px) {
+  .cta-inner, .footer-grid, .section-head { grid-template-columns: 1fr; gap: 32px; }
+  .nav-links { display: none; }
+  .nav-toggle { display: inline-flex; }
+  body.nav-open .nav-links {
+    display: flex;
+    position: fixed;
+    top: 72px; left: 0; right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 12px 32px 20px;
+    background: rgba(6, 16, 31, 0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line);
+    z-index: 49;
+  }
+  body.nav-open .nav-links a {
+    padding: 14px 0;
+    font-size: 15px;
+    border-bottom: 1px dashed var(--line);
+  }
+  body.nav-open .nav-links a.btn {
+    margin-top: 12px;
+    border-bottom: 1px solid var(--line-strong);
+    justify-content: center;
+  }
+  .tiers, .coverage-grid, .deliverables { grid-template-columns: 1fr; }
+  .diagram-legend { grid-template-columns: 1fr 1fr; }
+  .legend-item:nth-child(2) { border-right: 0; }
+}
+@media (max-width: 640px) {
+  .container { padding: 0 20px; }
+  .section { padding: 72px 0; }
+  .offer-hero { padding: 36px 0 56px; }
+  .row-2 { grid-template-columns: 1fr; }
+  .cta { padding: 72px 0; }
+  .cta-card { padding: 22px; }
+  .footer-bot { flex-direction: column; gap: 8px; }
+  .tier { padding: 28px 22px; }
+  .deliverable { padding: 22px; gap: 14px; }
+  .zone-card { padding: 22px; }
+  .testimonial { padding: 28px 20px 76px; }
+  .diagram-toolbar { flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px 18px; }
+  .diagram-toggles { flex-wrap: wrap; }
+  .diagram-svg { min-width: 720px; } /* keep readable; container scrolls horizontally */
+  .diagram-legend { grid-template-columns: 1fr; }
+  .legend-item { border-right: 0; border-bottom: 1px solid var(--line); }
+  .legend-item:last-child { border-bottom: 0; }
+  .timeline { grid-template-columns: 50px 1fr; }
+  .tl-week { padding: 16px 10px 16px 14px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 36 36" aria-hidden="true">
+          <defs>
+            <linearGradient id="lm-g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#7BE6F0"/>
+              <stop offset="100%" stop-color="#2BC0CF"/>
+            </linearGradient>
+          </defs>
+          <polygon points="18,3 31,10.5 31,25.5 18,33 5,25.5 5,10.5" fill="none" stroke="url(#lm-g)" stroke-width="1.4"/>
+          <polygon points="18,10 25.5,23 10.5,23" fill="none" stroke="#F2C84B" stroke-width="1.3"/>
+          <circle cx="18" cy="19" r="1.6" fill="#F2C84B"/>
+          <circle cx="18" cy="3" r="1" fill="#7BE6F0"/>
+          <circle cx="31" cy="25.5" r="1" fill="#7BE6F0"/>
+          <circle cx="5" cy="25.5" r="1" fill="#7BE6F0"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text">CRIT</div>
+        <div class="brand-sub">LOW VOLTAGE</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="/#services">Services</a>
+      <a href="/#process">Process</a>
+      <a href="/#projects">Projects</a>
+      <a href="/what-we-offer.html" class="active">What We Offer</a>
+      <a href="/#contact" class="btn btn-ghost" style="padding: 9px 16px;">
+        Request quote
+        <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
+      </a>
+    </div>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <svg class="ic-menu" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6">
+        <line x1="4" y1="7" x2="20" y2="7"/>
+        <line x1="4" y1="12" x2="20" y2="12"/>
+        <line x1="4" y1="17" x2="20" y2="17"/>
+      </svg>
+      <svg class="ic-close" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6">
+        <line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="18" y1="6" x2="6" y2="18"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ============ SUBNAV ============ -->
+<div class="subnav">
+  <div class="container subnav-inner">
+    <a href="#tiers">Packages</a>
+    <a href="#diagram">Reference Install</a>
+    <a href="#coverage">Coverage</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#deliverables">Deliverables</a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="offer-hero">
+  <svg class="hero-bg" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(123,230,240,0.06)" stroke-width="1"/>
+      </pattern>
+      <radialGradient id="vfade" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="rgba(6,16,31,0)"/>
+        <stop offset="100%" stop-color="rgba(6,16,31,1)"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="600" fill="url(#grid)"/>
+    <g stroke="rgba(123,230,240,0.18)" fill="none" stroke-width="1">
+      <path d="M0,120 L160,120 L180,140 L320,140 L340,120 L520,120"/>
+      <path d="M1200,200 L1040,200 L1020,220 L900,220"/>
+      <path d="M0,480 L120,480 L140,460 L280,460"/>
+      <path d="M1200,520 L900,520 L880,500 L760,500"/>
+    </g>
+    <g fill="rgba(123,230,240,0.4)">
+      <circle cx="160" cy="120" r="2"/>
+      <circle cx="520" cy="120" r="2"/>
+      <circle cx="900" cy="220" r="2"/>
+      <circle cx="280" cy="460" r="2"/>
+      <circle cx="760" cy="500" r="2"/>
+    </g>
+    <rect width="1200" height="600" fill="url(#vfade)"/>
+  </svg>
+  <div class="container" style="position: relative;">
+    <span class="pill"><span class="dot"></span>Reference Build · Anatomy of an Install</span>
+    <h1>What a CRIT install <em>actually</em> looks like.</h1>
+    <p>From a single tenant fit-up to a multi-building campus &mdash; here is the full breakdown of packages, the reference floorplan, the coverage layers, the timeline and the documentation you walk away with.</p>
+  </div>
+</section>
+
+<!-- ============ TIERS ============ -->
+<section class="section" id="tiers">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Packages / 01</span>
+        <h2 style="margin-top: 16px;">Three ways CRIT shows up.</h2>
+      </div>
+      <p>Every job is custom-scoped, but most fall into one of three shapes. Use these as a planning starting point &mdash; actual quote follows the site walk.</p>
+    </div>
+    <div class="tiers">
+
+      <div class="tier">
+        <div class="tier-num">/ 01</div>
+        <h3>CRIT Essential</h3>
+        <div class="tier-tag">Single Tenant / Small Office</div>
+        <div class="tier-meta">
+          <div class="tier-meta-item"><div class="k">Sq Ft</div><div class="v">&lt; 5,000 sq ft</div></div>
+          <div class="tier-meta-item"><div class="k">Timeline</div><div class="v">1&ndash;2 weeks</div></div>
+          <div class="tier-meta-item"><div class="k">Drops</div><div class="v">20&ndash;80</div></div>
+          <div class="tier-meta-item"><div class="k">Closets</div><div class="v">1 (MDF only)</div></div>
+        </div>
+        <ul>
+          <li>Cat6 structured cabling, certified</li>
+          <li>1 MDF rack with patch panels + switch</li>
+          <li>Up to 8 IP cameras with on-prem NVR</li>
+          <li>Single-door access control (optional)</li>
+          <li>Wi-Fi: 2&ndash;5 access points</li>
+          <li>Labeling, as-builts and Fluke test reports</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost" style="align-self: flex-start;">
+          Quote this tier
+          <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
+        </a>
+      </div>
+
+      <div class="tier featured">
+        <div class="tier-badge">Most Common</div>
+        <div class="tier-num">/ 02</div>
+        <h3>CRIT Standard</h3>
+        <div class="tier-tag">Multi-Floor / Mid-Size Facility</div>
+        <div class="tier-meta">
+          <div class="tier-meta-item"><div class="k">Sq Ft</div><div class="v">5,000&ndash;50,000 sq ft</div></div>
+          <div class="tier-meta-item"><div class="k">Timeline</div><div class="v">3&ndash;6 weeks</div></div>
+          <div class="tier-meta-item"><div class="k">Drops</div><div class="v">80&ndash;400</div></div>
+          <div class="tier-meta-item"><div class="k">Closets</div><div class="v">1 MDF + 1&ndash;3 IDFs</div></div>
+        </div>
+        <ul>
+          <li>Cat6A structured cabling + OM4 fiber backbone</li>
+          <li>MDF + IDF closets, BICSI-aligned pathways</li>
+          <li>12&ndash;48 IP cameras, redundant NVR</li>
+          <li>Multi-door card access (HID / Mercury)</li>
+          <li>Wi-Fi: 6&ndash;24 access points, full survey</li>
+          <li>Conference AV, paging, intercom</li>
+          <li>Documentation binder + DCIM exports</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost" style="align-self: flex-start;">
+          Quote this tier
+          <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
+        </a>
+      </div>
+
+      <div class="tier">
+        <div class="tier-num">/ 03</div>
+        <h3>CRIT Enterprise</h3>
+        <div class="tier-tag">Campus / Multi-Building</div>
+        <div class="tier-meta">
+          <div class="tier-meta-item"><div class="k">Sq Ft</div><div class="v">50,000+ sq ft</div></div>
+          <div class="tier-meta-item"><div class="k">Timeline</div><div class="v">8&ndash;16 weeks</div></div>
+          <div class="tier-meta-item"><div class="k">Drops</div><div class="v">400&ndash;2,000+</div></div>
+          <div class="tier-meta-item"><div class="k">Closets</div><div class="v">MDF + 4+ IDFs</div></div>
+        </div>
+        <ul>
+          <li>Single-mode fiber inter-building backbone</li>
+          <li>Redundant MDF, hot-aisle data center work</li>
+          <li>50+ IP cameras with VMS + analytics</li>
+          <li>Enterprise access control, mobile credentials</li>
+          <li>Wi-Fi: 25+ APs, 802.11ax, full RF design</li>
+          <li>AV-over-IP, distributed audio, signage</li>
+          <li>SLA-backed service contract</li>
+          <li>Dedicated PM and as-built drawings</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost" style="align-self: flex-start;">
+          Quote this tier
+          <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ INFRASTRUCTURE DIAGRAM ============ -->
+<section class="section" id="diagram">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Reference Install / 02</span>
+        <h2 style="margin-top: 16px;">Anatomy of a CRIT Standard install.</h2>
+      </div>
+      <p>A 22,000 sq ft single-floor office with warehouse &mdash; drawn out the same way our project drawings come back to you. Toggle layers on and off.</p>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="diagram-toolbar">
+        <span>FLOORPLAN · REFERENCE INSTALL · 22,000 SQ FT · SCALE 1:120</span>
+        <div class="diagram-toggles" id="diagram-toggles"></div>
+      </div>
+
+      <div class="diagram-svg-wrap">
+      <svg class="diagram-svg" viewBox="0 0 1100 600" preserveAspectRatio="xMidYMid meet" id="diagram-svg">
+        <defs>
+          <pattern id="grid-d" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(123,230,240,0.06)" stroke-width="0.6"/>
+          </pattern>
+          <radialGradient id="apField" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(123,240,181,0.32)"/>
+            <stop offset="60%" stop-color="rgba(123,240,181,0.08)"/>
+            <stop offset="100%" stop-color="rgba(123,240,181,0)"/>
+          </radialGradient>
+          <radialGradient id="camField" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(242,200,75,0.10)"/>
+            <stop offset="100%" stop-color="rgba(242,200,75,0)"/>
+          </radialGradient>
+        </defs>
+
+        <rect width="1100" height="600" fill="url(#grid-d)"/>
+        <rect x="55" y="55" width="990" height="490" fill="none" stroke="rgba(123,230,240,0.55)" stroke-width="2"/>
+
+        <g id="rooms-layer"></g>
+
+        <rect x="60" y="270" width="130" height="110" fill="rgba(123,230,240,0.10)" stroke="#7BE6F0" stroke-width="1.4"/>
+        <rect x="760" y="270" width="130" height="110" fill="rgba(123,230,240,0.07)" stroke="#7BE6F0" stroke-width="1" stroke-dasharray="3 3"/>
+
+        <g id="layer-wifi-fields"></g>
+        <g id="layer-cabling"></g>
+        <g id="layer-cameras"></g>
+        <g id="layer-access"></g>
+        <g id="layer-wifi"></g>
+
+        <text x="125" y="332" fill="#7BE6F0" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="600" text-anchor="middle">MDF</text>
+        <text x="825" y="332" fill="#7BE6F0" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="600" text-anchor="middle">IDF-1</text>
+
+        <g transform="translate(1010, 570)">
+          <circle r="14" fill="none" stroke="rgba(123,230,240,0.4)"/>
+          <text y="-16" text-anchor="middle" fill="#7BE6F0" font-family="JetBrains Mono, monospace" font-size="10">N</text>
+          <line y1="-12" y2="6" stroke="#7BE6F0" stroke-width="1.4"/>
+          <polygon points="-3,-9 0,-14 3,-9" fill="#F2C84B"/>
+        </g>
+      </svg>
+      </div>
+
+      <div class="diagram-legend" id="diagram-legend"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COVERAGE ============ -->
+<section class="section" id="coverage" style="background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Coverage / 03</span>
+        <h2 style="margin-top: 16px;">What &ldquo;coverage&rdquo; actually means.</h2>
+      </div>
+      <p>Three intersecting layers. Designed together, installed together, documented together.</p>
+    </div>
+    <div class="coverage-grid">
+
+      <div class="zone-card">
+        <svg viewBox="0 0 280 140" class="zone-vis" preserveAspectRatio="xMidYMid meet">
+          <rect width="280" height="140" fill="rgba(15,30,54,0.4)"/>
+          <rect x="20" y="40" width="40" height="70" fill="none" stroke="#7BE6F0" stroke-width="1.4"/>
+          <line x1="20" y1="50" x2="60" y2="50" stroke="#7BE6F0" stroke-width="0.8"/>
+          <line x1="20" y1="62" x2="60" y2="62" stroke="#7BE6F0" stroke-width="0.8"/>
+          <line x1="20" y1="74" x2="60" y2="74" stroke="#7BE6F0" stroke-width="0.8"/>
+          <line x1="20" y1="86" x2="60" y2="86" stroke="#7BE6F0" stroke-width="0.8"/>
+          <line x1="20" y1="98" x2="60" y2="98" stroke="#7BE6F0" stroke-width="0.8"/>
+          <text x="40" y="125" fill="#7BE6F0" font-family="JetBrains Mono, monospace" font-size="8" text-anchor="middle">MDF</text>
+          <path d="M 60 60 L 140 60 L 160 50 L 240 50" stroke="#7BE6F0" stroke-width="1.4" fill="none" opacity="0.85"/>
+          <path d="M 60 75 L 140 75 L 160 70 L 240 70" stroke="#7BE6F0" stroke-width="1.4" fill="none" opacity="0.85"/>
+          <path d="M 60 90 L 140 90 L 160 90 L 240 90" stroke="#7BE6F0" stroke-width="1.4" fill="none" opacity="0.85"/>
+          <path d="M 60 105 L 140 105 L 160 110 L 240 110" stroke="#7BE6F0" stroke-width="1.4" fill="none" opacity="0.85"/>
+          <path d="M 60 120 L 140 120 L 160 130 L 240 130" stroke="#7BE6F0" stroke-width="1.4" fill="none" opacity="0.85"/>
+          <rect x="237" y="48" width="6" height="6" fill="#7BE6F0"/>
+          <rect x="237" y="68" width="6" height="6" fill="#7BE6F0"/>
+          <rect x="237" y="88" width="6" height="6" fill="#7BE6F0"/>
+          <rect x="237" y="108" width="6" height="6" fill="#7BE6F0"/>
+          <rect x="237" y="128" width="6" height="6" fill="#7BE6F0"/>
+        </svg>
+        <h4>Connectivity</h4>
+        <p>Every workstation, conference room, camera and AP gets a certified Cat6/6A drop back to MDF or IDF. Fluke tested, labeled both ends.</p>
+        <div class="specs">
+          <span class="spec mono">CAT6/6A</span>
+          <span class="spec mono">OM4 FIBER</span>
+          <span class="spec mono">&lt;99% PASS</span>
+        </div>
+      </div>
+
+      <div class="zone-card">
+        <svg viewBox="0 0 280 140" class="zone-vis" preserveAspectRatio="xMidYMid meet">
+          <rect width="280" height="140" fill="rgba(15,30,54,0.4)"/>
+          <g>
+            <circle cx="40" cy="30" r="4" fill="#F2C84B"/>
+            <path d="M 40 30 L -20 130 L 100 130 Z" fill="rgba(242,200,75,0.12)" stroke="rgba(242,200,75,0.4)" stroke-width="1"/>
+          </g>
+          <g>
+            <circle cx="140" cy="30" r="4" fill="#F2C84B"/>
+            <path d="M 140 30 L 80 130 L 200 130 Z" fill="rgba(242,200,75,0.12)" stroke="rgba(242,200,75,0.4)" stroke-width="1"/>
+          </g>
+          <g>
+            <circle cx="240" cy="30" r="4" fill="#F2C84B"/>
+            <path d="M 240 30 L 180 130 L 300 130 Z" fill="rgba(242,200,75,0.12)" stroke="rgba(242,200,75,0.4)" stroke-width="1"/>
+          </g>
+          <line x1="0" y1="130" x2="280" y2="130" stroke="rgba(123,230,240,0.4)" stroke-width="1"/>
+        </svg>
+        <h4>Camera Coverage</h4>
+        <p>Every entrance, exit, corridor intersection and high-value zone is covered. Overlapping fields of view, zero exterior blind spots.</p>
+        <div class="specs">
+          <span class="spec mono">IP / 4K</span>
+          <span class="spec mono">30D RETENTION</span>
+          <span class="spec mono">OVERLAP 15%</span>
+        </div>
+      </div>
+
+      <div class="zone-card">
+        <svg viewBox="0 0 280 140" class="zone-vis" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <radialGradient id="wfg" cx="50%" cy="60%" r="60%">
+              <stop offset="0%" stop-color="rgba(123,240,181,0.6)"/>
+              <stop offset="100%" stop-color="rgba(123,240,181,0)"/>
+            </radialGradient>
+          </defs>
+          <rect width="280" height="140" fill="rgba(15,30,54,0.4)"/>
+          <g>
+            <circle cx="70" cy="80" r="50" fill="url(#wfg)"/>
+            <circle cx="70" cy="80" r="6" fill="none" stroke="#7BF0B5" stroke-width="1.5"/>
+            <circle cx="70" cy="80" r="2" fill="#7BF0B5"/>
+          </g>
+          <g>
+            <circle cx="140" cy="60" r="50" fill="url(#wfg)"/>
+            <circle cx="140" cy="60" r="6" fill="none" stroke="#7BF0B5" stroke-width="1.5"/>
+            <circle cx="140" cy="60" r="2" fill="#7BF0B5"/>
+          </g>
+          <g>
+            <circle cx="210" cy="80" r="50" fill="url(#wfg)"/>
+            <circle cx="210" cy="80" r="6" fill="none" stroke="#7BF0B5" stroke-width="1.5"/>
+            <circle cx="210" cy="80" r="2" fill="#7BF0B5"/>
+          </g>
+          <line x1="0" y1="120" x2="280" y2="120" stroke="rgba(123,230,240,0.4)" stroke-width="1"/>
+        </svg>
+        <h4>Wi-Fi Coverage</h4>
+        <p>RF surveys before AP placement. Roaming hand-offs, dedicated guest VLAN, and capacity for the actual user count &mdash; not just the floorplan.</p>
+        <div class="specs">
+          <span class="spec mono">802.11AX</span>
+          <span class="spec mono">&minus;65 dBm FLOOR</span>
+          <span class="spec mono">CHANNEL PLAN</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ TIMELINE ============ -->
+<section class="section" id="timeline">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Timeline / 04</span>
+        <h2 style="margin-top: 16px;">Six weeks, end&#8209;to&#8209;end.</h2>
+      </div>
+      <p>A typical Standard tier install. Larger jobs scale linearly &mdash; same milestones, longer pulls.</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-row">
+        <div class="tl-week mono">WK 01</div>
+        <div class="tl-content"><h5>Site walk + design</h5><p>Walk every closet, ceiling and pathway. Drawings, BOM and labeling scheme delivered end-of-week.</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-week mono">WK 02</div>
+        <div class="tl-content"><h5>Mobilization</h5><p>Material on site, J-hooks set, fire-stop sleeves placed, MDF/IDF racks staged.</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-week mono">WK 03&ndash;04</div>
+        <div class="tl-content"><h5>Cable pull</h5><p>Trunks, drops and fiber backbone. Photos uploaded daily to your shared project folder.</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-week mono">WK 05</div>
+        <div class="tl-content"><h5>Termination + test</h5><p>Patch panels, jacks, every run Fluke certified. Rework on the spot for any failed pair.</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-week mono">WK 06</div>
+        <div class="tl-content"><h5>Devices + commission</h5><p>Cameras, APs, readers and panels installed and configured. Integrated with your VMS, IDP and IT directory.</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-week mono">WK 07</div>
+        <div class="tl-content"><h5>Walkthrough + handoff</h5><p>On-site walkthrough with your team. As-builts, test reports, credentials and documentation binder delivered.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DELIVERABLES ============ -->
+<section class="section" id="deliverables">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Handoff / 05</span>
+        <h2 style="margin-top: 16px;">What you actually get.</h2>
+      </div>
+      <p>The install is 60% of the value. The other 40% is everything we hand you on the way out.</p>
+    </div>
+    <div class="deliverables">
+
+      <div class="deliverable">
+        <div class="ic">
+          <svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4">
+            <rect x="4" y="5" width="20" height="7" rx="1"/>
+            <rect x="4" y="16" width="20" height="7" rx="1"/>
+            <circle cx="20" cy="8.5" r="0.8" fill="currentColor"/>
+            <circle cx="20" cy="19.5" r="0.8" fill="currentColor"/>
+            <line x1="7" y1="8.5" x2="14" y2="8.5"/>
+            <line x1="7" y1="19.5" x2="14" y2="19.5"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Fluke test reports</h4>
+          <p>Every run certified, every result archived. PDF report at handoff.</p>
+        </div>
+      </div>
+
+      <div class="deliverable">
+        <div class="ic">
+          <svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4">
+            <circle cx="14" cy="6" r="2.5"/>
+            <circle cx="6" cy="22" r="2.5"/>
+            <circle cx="22" cy="22" r="2.5"/>
+            <line x1="14" y1="8.5" x2="7" y2="20"/>
+            <line x1="14" y1="8.5" x2="21" y2="20"/>
+            <line x1="8.5" y1="22" x2="19.5" y2="22"/>
+          </svg>
+        </div>
+        <div>
+          <h4>As-built drawings</h4>
+          <p>Updated floorplan with every drop, camera, AP and door numbered to match labels.</p>
+        </div>
+      </div>
+
+      <div class="deliverable">
+        <div class="ic">
+          <svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4">
+            <rect x="3" y="9" width="9" height="10" rx="1.5"/>
+            <rect x="16" y="11" width="9" height="6" rx="1"/>
+            <line x1="12" y1="14" x2="16" y2="14"/>
+            <line x1="6" y1="6" x2="6" y2="9"/>
+            <line x1="9" y1="6" x2="9" y2="9"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Labeling schema</h4>
+          <p>Consistent naming convention from patch panel to wall plate. Findable years later.</p>
+        </div>
+      </div>
+
+      <div class="deliverable">
+        <div class="ic">
+          <svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4">
+            <rect x="6" y="13" width="16" height="11" rx="1.5"/>
+            <path d="M9 13 V9 a5 5 0 0 1 10 0 V13"/>
+            <circle cx="14" cy="18" r="1.4" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Credentials handoff</h4>
+          <p>Admin accounts, RMA contacts, license keys &mdash; all transferred and documented.</p>
+        </div>
+      </div>
+
+      <div class="deliverable">
+        <div class="ic">
+          <svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4">
+            <rect x="3" y="8" width="17" height="12" rx="1.5"/>
+            <path d="M20 12 L25 9 L25 19 L20 16 Z"/>
+            <circle cx="11" cy="14" r="2.5"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Coverage maps</h4>
+          <p>Annotated maps showing every camera FOV and Wi-Fi heatmap.</p>
+        </div>
+      </div>
+
+      <div class="deliverable">
+        <div class="ic">
+          <svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M5 11 H10 L16 6 V22 L10 17 H5 Z"/>
+            <path d="M19 9 a5 5 0 0 1 0 10"/>
+            <path d="M22 6 a8 8 0 0 1 0 16"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Maintenance plan</h4>
+          <p>Optional service contract with quarterly check-ins and SLA-backed response.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="cta" id="contact">
+  <div class="container">
+    <div class="cta-inner">
+      <div>
+        <span class="eyebrow">Get in touch / 06</span>
+        <h2 style="margin-top: 18px; margin-bottom: 22px;">Got a building, a deadline, and a stack of low-voltage scope?</h2>
+        <p style="color: var(--ink-2); font-size: 17px; max-width: 540px; margin-bottom: 36px;">
+          Send us the floorplan and a date. We will walk the site this week and have a real number on your desk by next.
+        </p>
+        <div class="cta-card" style="max-width: 480px;">
+          <div class="cta-card-row">
+            <div class="ic">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M4 3 L8 3 L9.5 7 L7 9 a8 8 0 0 0 4 4 L13 10.5 L17 12 V16 a1 1 0 0 1 -1 1 A13 13 0 0 1 3 4 a1 1 0 0 1 1 -1 Z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="label-i">Direct</div>
+              <div class="val">(919) 555&#8209;0142</div>
+            </div>
+          </div>
+          <div class="cta-card-row">
+            <div class="ic">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4">
+                <rect x="2" y="4" width="16" height="12" rx="1"/>
+                <path d="M2 5 L10 11 L18 5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="label-i">Email</div>
+              <div class="val">jason@critlv.com</div>
+            </div>
+          </div>
+          <div class="cta-card-row">
+            <div class="ic">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M10 2 a6 6 0 0 1 6 6 c0 5 -6 10 -6 10 S4 13 4 8 a6 6 0 0 1 6 -6 Z"/>
+                <circle cx="10" cy="8" r="2"/>
+              </svg>
+            </div>
+            <div>
+              <div class="label-i">Office</div>
+              <div class="val">123 Data Dr., Raleigh, NC 27601</div>
+            </div>
+          </div>
+          <div class="cta-card-row">
+            <div class="ic">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4">
+                <circle cx="10" cy="10" r="7"/>
+                <path d="M10 6 V10 L13 12"/>
+              </svg>
+            </div>
+            <div>
+              <div class="label-i">Hours</div>
+              <div class="val">Mon&ndash;Fri 7a&ndash;6p · 24/7 on-call</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-card" id="contact-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h3 style="font-size: 20px;">Request a site walk</h3>
+          <span class="pill"><span class="dot"></span>Avail. this week</span>
+        </div>
+        <form class="contact-form" id="contact-form">
+          <div class="row-2">
+            <div>
+              <label class="label">Name</label>
+              <input class="input" required placeholder="Your name"/>
+            </div>
+            <div>
+              <label class="label">Company</label>
+              <input class="input" placeholder="Company"/>
+            </div>
+          </div>
+          <div class="row-2">
+            <div>
+              <label class="label">Email</label>
+              <input class="input" type="email" required placeholder="you@company.com"/>
+            </div>
+            <div>
+              <label class="label">Phone</label>
+              <input class="input" placeholder="(555) 555-0100"/>
+            </div>
+          </div>
+          <div>
+            <label class="label">Scope</label>
+            <select class="select" required>
+              <option value="" disabled selected>Select scope&hellip;</option>
+              <option>Structured cabling</option>
+              <option>Surveillance / cameras</option>
+              <option>Access control</option>
+              <option>AV / paging</option>
+              <option>Multiple / not sure</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Tell us about the project</label>
+            <textarea class="textarea" placeholder="Address, square footage, target date, anything we should know&hellip;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+            Send request
+            <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
+          </button>
+        </form>
+        <div id="contact-success" style="display:none; padding: 40px 0; text-align: center; color: var(--ink-2);">
+          <div style="font-size: 24px; color: var(--cyan); margin-bottom: 12px;">&check; Request sent</div>
+          <p style="font-size: 14px;">We&rsquo;ll reach out within one business day.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 16px;">
+          <div class="brand-mark">
+            <svg viewBox="0 0 36 36" aria-hidden="true">
+              <polygon points="18,3 31,10.5 31,25.5 18,33 5,25.5 5,10.5" fill="none" stroke="url(#lm-g)" stroke-width="1.4"/>
+              <polygon points="18,10 25.5,23 10.5,23" fill="none" stroke="#F2C84B" stroke-width="1.3"/>
+              <circle cx="18" cy="19" r="1.6" fill="#F2C84B"/>
+              <circle cx="18" cy="3" r="1" fill="#7BE6F0"/>
+              <circle cx="31" cy="25.5" r="1" fill="#7BE6F0"/>
+              <circle cx="5" cy="25.5" r="1" fill="#7BE6F0"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-text">CRIT</div>
+            <div class="brand-sub">LOW VOLTAGE</div>
+          </div>
+        </div>
+        <p style="color: var(--ink-3); font-size: 13px; max-width: 320px;">
+          Communications Resources, Innovations &amp; Technologies. A Raleigh, NC low voltage contractor.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h5>Pages</h5>
+        <a href="/">Home</a>
+        <a href="/what-we-offer.html">What We Offer</a>
+        <a href="/#services">Services</a>
+        <a href="/#projects">Projects</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="tel:9195550142">(919) 555-0142</a>
+        <a href="mailto:jason@critlv.com">jason@critlv.com</a>
+        <a href="#">123 Data Dr., Raleigh NC</a>
+      </div>
+      <div class="footer-col">
+        <h5>Get started</h5>
+        <a href="#contact" class="btn btn-primary" style="margin-top: 4px;">
+          Request a site walk
+          <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div>&copy; 2026 CRIT LOW VOLTAGE SOLUTIONS, LLC</div>
+      <div>RALEIGH, NC · ALL RIGHTS RESERVED</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ====== MOBILE NAV TOGGLE ======
+(function () {
+  const t = document.getElementById('nav-toggle');
+  if (!t) return;
+  t.addEventListener('click', () => {
+    const open = document.body.classList.toggle('nav-open');
+    t.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.body.classList.remove('nav-open');
+      t.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
+
+(function () {
+  // ====== DIAGRAM DATA ======
+  const LAYERS = {
+    cabling: { name: 'Structured Cabling',  color: '#7BE6F0', count: '142 drops' },
+    cameras: { name: 'IP Cameras',          color: '#F2C84B', count: '28 cameras' },
+    access:  { name: 'Access Control',      color: '#B79CFF', count: '12 doors' },
+    wifi:    { name: 'Wi-Fi Access Points', color: '#7BF0B5', count: '14 APs' },
+  };
+
+  const ROOMS = [
+    { x: 60,  y: 60,  w: 220, h: 200, label: 'OPEN OFFICE — NORTH', sub: 'Workstations · 24 desks' },
+    { x: 290, y: 60,  w: 200, h: 100, label: 'CONF A',    sub: '12-person AV' },
+    { x: 290, y: 165, w: 100, h: 95,  label: 'HUDDLE',    sub: '4-person' },
+    { x: 395, y: 165, w: 95,  h: 95,  label: 'PHONE',     sub: 'Booth' },
+    { x: 500, y: 60,  w: 250, h: 100, label: 'CONF B / TRAINING',  sub: '20-person AV' },
+    { x: 500, y: 165, w: 250, h: 95,  label: 'EXEC OFFICES',       sub: '4 perimeter' },
+    { x: 760, y: 60,  w: 280, h: 200, label: 'OPEN OFFICE — EAST', sub: 'Workstations · 28 desks' },
+    { x: 60,  y: 270, w: 130, h: 110, label: 'MDF',      sub: 'Main Distribution' },
+    { x: 200, y: 270, w: 90,  h: 110, label: 'BREAK',    sub: 'Kitchenette' },
+    { x: 295, y: 270, w: 200, h: 110, label: 'LOBBY',    sub: 'Reception · entry' },
+    { x: 500, y: 270, w: 250, h: 110, label: 'CORRIDOR', sub: '' },
+    { x: 760, y: 270, w: 130, h: 110, label: 'IDF-1',    sub: 'East riser closet' },
+    { x: 895, y: 270, w: 145, h: 110, label: 'COPY/STG', sub: 'Print + storage' },
+    { x: 60,  y: 390, w: 280, h: 150, label: 'OPEN OFFICE — SOUTH', sub: 'Workstations · 32 desks' },
+    { x: 350, y: 390, w: 200, h: 150, label: 'CALL CENTER',         sub: 'Workstations · 22 desks' },
+    { x: 560, y: 390, w: 190, h: 150, label: 'IT / LAB',            sub: 'Test bench' },
+    { x: 760, y: 390, w: 280, h: 150, label: 'WAREHOUSE / SHIPPING', sub: 'High-bay · receiving' },
+  ];
+
+  const TRUNKS = [
+    'M 130 380 L 130 540 L 130 540',
+    'M 130 270 L 130 200 L 290 200',
+    'M 130 270 L 130 60',
+    'M 195 325 L 760 325',
+    'M 130 270 L 130 200',
+    'M 825 270 L 825 200',
+    'M 825 380 L 825 540',
+  ];
+
+  function gridPoints(x0, y0, cols, rows, dx, dy) {
+    const out = [];
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++)
+        out.push([x0 + c * dx, y0 + r * dy]);
+    return out;
+  }
+
+  const DROPS = [
+    ...gridPoints(80,  85,  6, 4, 32, 35),
+    ...gridPoints(780, 85,  7, 4, 32, 35),
+    ...gridPoints(80,  410, 7, 3, 35, 40),
+    ...gridPoints(370, 410, 5, 3, 32, 40),
+    ...gridPoints(780, 410, 6, 3, 38, 40),
+    [310, 90], [330, 90], [410, 190], [520, 90], [560, 90], [600, 90], [640, 90],
+    [515, 195], [555, 195], [595, 195], [635, 195], [675, 195],
+    [580, 415], [620, 415], [660, 415], [700, 415], [580, 460], [620, 460], [660, 460], [700, 460],
+    [340, 350], [370, 350],
+  ];
+
+  const CAMERAS = [
+    [70, 70], [275, 70], [495, 70], [755, 70], [1030, 70],
+    [275, 380], [495, 380], [755, 380],
+    [70, 390], [340, 540], [560, 540], [755, 390], [1030, 540],
+    [285, 285], [285, 365], [195, 270], [890, 270], [890, 380],
+    [60, 540], [340, 270], [495, 270], [755, 270], [890, 540],
+    [70, 270], [55, 200], [350, 60], [560, 60], [760, 60],
+    [200, 540], [400, 270], [620, 270],
+  ];
+
+  const DOORS = [
+    [340, 325], [395, 325], [60, 325], [1040, 325], [60, 480], [890, 480],
+    [195, 270], [825, 270], [600, 165],
+    [350, 540], [560, 540], [760, 540],
+  ];
+
+  const APS = [
+    [170, 160], [380, 110], [620, 110], [880, 160],
+    [170, 460], [450, 460], [650, 460], [880, 460],
+    [375, 325], [625, 325], [890, 325],
+    [890, 110], [380, 220], [880, 540],
+  ];
+
+  // ====== BUILD SVG ======
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const el = (name, attrs, children) => {
+    const n = document.createElementNS(SVG_NS, name);
+    if (attrs) for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (children) for (const c of children) n.appendChild(c);
+    return n;
+  };
+  const text = (s) => document.createTextNode(s);
+
+  // Rooms
+  const roomsLayer = document.getElementById('rooms-layer');
+  for (const r of ROOMS) {
+    const g = el('g');
+    g.appendChild(el('rect', {
+      x: r.x, y: r.y, width: r.w, height: r.h,
+      fill: 'rgba(15,30,54,0.6)', stroke: 'rgba(123,230,240,0.3)', 'stroke-width': '1',
+    }));
+    const lbl = el('text', {
+      x: r.x + 10, y: r.y + 18, fill: '#A9BACB',
+      'font-family': 'JetBrains Mono, monospace', 'font-size': '10', 'letter-spacing': '1.4',
+    });
+    lbl.appendChild(text(r.label));
+    g.appendChild(lbl);
+    if (r.sub) {
+      const sub = el('text', {
+        x: r.x + 10, y: r.y + 32, fill: '#6B829A',
+        'font-family': 'JetBrains Mono, monospace', 'font-size': '9',
+      });
+      sub.appendChild(text(r.sub));
+      g.appendChild(sub);
+    }
+    roomsLayer.appendChild(g);
+  }
+
+  // Wi-Fi coverage fields (bottom)
+  const wifiFieldsLayer = document.getElementById('layer-wifi-fields');
+  for (const [x, y] of APS) {
+    wifiFieldsLayer.appendChild(el('circle', { cx: x, cy: y, r: 120, fill: 'url(#apField)' }));
+  }
+
+  // Cabling: trunks + backbone + drops
+  const cablingLayer = document.getElementById('layer-cabling');
+  const trunksGroup = el('g', { stroke: '#7BE6F0', 'stroke-width': '2', fill: 'none', opacity: '0.85' });
+  for (const d of TRUNKS) {
+    trunksGroup.appendChild(el('path', { d, 'stroke-dasharray': '0' }));
+  }
+  cablingLayer.appendChild(trunksGroup);
+  cablingLayer.appendChild(el('path', {
+    d: 'M 195 325 L 760 325', stroke: '#F2C84B', 'stroke-width': '2.4',
+    'stroke-dasharray': '6 4', opacity: '0.85', fill: 'none',
+  }));
+  for (const [x, y] of DROPS) {
+    cablingLayer.appendChild(el('rect', {
+      x: x - 3, y: y - 3, width: 6, height: 6, fill: '#7BE6F0', opacity: '0.9',
+    }));
+  }
+
+  // Cameras
+  const camerasLayer = document.getElementById('layer-cameras');
+  for (const [x, y] of CAMERAS) {
+    const g = el('g');
+    g.appendChild(el('circle', { cx: x, cy: y, r: 18, fill: 'url(#camField)' }));
+    g.appendChild(el('circle', { cx: x, cy: y, r: 4,  fill: '#F2C84B' }));
+    g.appendChild(el('circle', { cx: x, cy: y, r: 6,  fill: 'none', stroke: '#F2C84B', 'stroke-width': '1' }));
+    camerasLayer.appendChild(g);
+  }
+
+  // Access doors
+  const accessLayer = document.getElementById('layer-access');
+  for (const [x, y] of DOORS) {
+    const g = el('g');
+    g.appendChild(el('rect', {
+      x: x - 5, y: y - 5, width: 10, height: 10,
+      fill: 'none', stroke: '#B79CFF', 'stroke-width': '1.4',
+    }));
+    g.appendChild(el('line', {
+      x1: x - 7, y1: y, x2: x + 7, y2: y, stroke: '#B79CFF', 'stroke-width': '1.4',
+    }));
+    accessLayer.appendChild(g);
+  }
+
+  // Wi-Fi APs
+  const wifiLayer = document.getElementById('layer-wifi');
+  for (const [x, y] of APS) {
+    const g = el('g');
+    g.appendChild(el('circle', { cx: x, cy: y, r: 6, fill: 'none', stroke: '#7BF0B5', 'stroke-width': '1.5' }));
+    g.appendChild(el('circle', { cx: x, cy: y, r: 2, fill: '#7BF0B5' }));
+    wifiLayer.appendChild(g);
+  }
+
+  // ====== TOOLBAR ======
+  const togglesEl = document.getElementById('diagram-toggles');
+  const layerEls = {
+    cabling: document.getElementById('layer-cabling'),
+    cameras: document.getElementById('layer-cameras'),
+    access:  document.getElementById('layer-access'),
+    wifi:    document.getElementById('layer-wifi'),
+  };
+  const wifiFieldsEl = document.getElementById('layer-wifi-fields');
+
+  const state = { cabling: true, cameras: true, access: true, wifi: true };
+
+  function paintBtn(btn, k) {
+    const on = state[k];
+    const color = LAYERS[k].color;
+    const swatch = btn.querySelector('.swatch');
+    if (on) {
+      btn.classList.add('on');
+      btn.style.background = color;
+      btn.style.borderColor = color;
+      btn.style.color = '#06101F';
+      swatch.style.background = '#06101F';
+    } else {
+      btn.classList.remove('on');
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = color;
+      swatch.style.background = color;
+    }
+  }
+
+  function applyLayer(k) {
+    const on = state[k];
+    layerEls[k].style.display = on ? '' : 'none';
+    if (k === 'wifi') wifiFieldsEl.style.display = on ? '' : 'none';
+  }
+
+  for (const k of Object.keys(LAYERS)) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toggle-btn';
+    btn.innerHTML = '<span class="swatch"></span>' + LAYERS[k].name;
+    btn.addEventListener('click', () => {
+      state[k] = !state[k];
+      paintBtn(btn, k);
+      applyLayer(k);
+    });
+    togglesEl.appendChild(btn);
+    paintBtn(btn, k);
+    applyLayer(k);
+  }
+
+  // ====== LEGEND ======
+  const legendEl = document.getElementById('diagram-legend');
+  for (const k of Object.keys(LAYERS)) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML =
+      '<span class="dot" style="background:' + LAYERS[k].color + '"></span>' +
+      '<span class="name">' + LAYERS[k].name + '</span>' +
+      '<span class="count">' + LAYERS[k].count + '</span>';
+    legendEl.appendChild(item);
+  }
+
+  // ====== CONTACT FORM ======
+  const form = document.getElementById('contact-form');
+  const success = document.getElementById('contact-success');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      form.style.display = 'none';
+      success.style.display = 'block';
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
