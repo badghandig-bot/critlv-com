@@ -271,16 +271,16 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <svg viewBox="0 0 36 36" aria-hidden="true">
           <defs>
             <linearGradient id="lm-g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#F2C84B"/>
-              <stop offset="100%" stop-color="#D9A828"/>
+              <stop offset="0%" stop-color="#7BE6F0"/>
+              <stop offset="100%" stop-color="#2BC0CF"/>
             </linearGradient>
           </defs>
           <polygon points="18,3 31,10.5 31,25.5 18,33 5,25.5 5,10.5" fill="none" stroke="url(#lm-g)" stroke-width="1.4"/>
-          <polygon points="18,10 25.5,23 10.5,23" fill="none" stroke="#F2C84B" stroke-width="1.3"/>
-          <circle cx="18" cy="19" r="1.6" fill="#F2C84B"/>
-          <circle cx="18" cy="3" r="1" fill="#F2C84B"/>
-          <circle cx="31" cy="25.5" r="1" fill="#F2C84B"/>
-          <circle cx="5" cy="25.5" r="1" fill="#F2C84B"/>
+          <polygon points="18,10 25.5,23 10.5,23" fill="none" stroke="#7BE6F0" stroke-width="1.3"/>
+          <circle cx="18" cy="19" r="1.6" fill="#7BE6F0"/>
+          <circle cx="18" cy="3" r="1" fill="#7BE6F0"/>
+          <circle cx="31" cy="25.5" r="1" fill="#7BE6F0"/>
+          <circle cx="5" cy="25.5" r="1" fill="#7BE6F0"/>
         </svg>
       </div>
       <div>
@@ -886,11 +886,11 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
           <div class="brand-mark">
             <svg viewBox="0 0 36 36" aria-hidden="true">
               <polygon points="18,3 31,10.5 31,25.5 18,33 5,25.5 5,10.5" fill="none" stroke="url(#lm-g)" stroke-width="1.4"/>
-              <polygon points="18,10 25.5,23 10.5,23" fill="none" stroke="#F2C84B" stroke-width="1.3"/>
-              <circle cx="18" cy="19" r="1.6" fill="#F2C84B"/>
-              <circle cx="18" cy="3" r="1" fill="#F2C84B"/>
-              <circle cx="31" cy="25.5" r="1" fill="#F2C84B"/>
-              <circle cx="5" cy="25.5" r="1" fill="#F2C84B"/>
+              <polygon points="18,10 25.5,23 10.5,23" fill="none" stroke="#7BE6F0" stroke-width="1.3"/>
+              <circle cx="18" cy="19" r="1.6" fill="#7BE6F0"/>
+              <circle cx="18" cy="3" r="1" fill="#7BE6F0"/>
+              <circle cx="31" cy="25.5" r="1" fill="#7BE6F0"/>
+              <circle cx="5" cy="25.5" r="1" fill="#7BE6F0"/>
             </svg>
           </div>
           <div>
@@ -1142,7 +1142,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
       const rr = R * 1.7 + Math.sin(now * 0.001 + i) * 6;
       const x = cx + Math.cos(a) * rr;
       const y = cy + Math.sin(a) * rr * 0.95;
-      ctx.fillStyle = 'rgba(242, 200, 75, ' + (0.06 + 0.18 * (i % 4 === 0 ? 1 : 0.4)) + ')';
+      ctx.fillStyle = 'rgba(123, 230, 240, ' + (0.06 + 0.18 * (i % 4 === 0 ? 1 : 0.4)) + ')';
       ctx.beginPath();
       ctx.arc(x, y, i % 6 === 0 ? 1.6 : 1, 0, TAU);
       ctx.fill();
@@ -1171,7 +1171,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(now * 0.0002);
-    ctx.strokeStyle = 'rgba(242, 200, 75, 0.14)';
+    ctx.strokeStyle = 'rgba(123, 230, 240, 0.14)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -1183,7 +1183,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     ctx.closePath();
     ctx.stroke();
     ctx.setLineDash([3, 6]);
-    ctx.strokeStyle = 'rgba(242, 200, 75, 0.22)';
+    ctx.strokeStyle = 'rgba(123, 230, 240, 0.22)';
     ctx.beginPath();
     ctx.arc(0, 0, R * 1.22, 0, TAU);
     ctx.stroke();
@@ -1209,10 +1209,10 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
       ctx.lineTo(f.b.x, f.b.y);
       ctx.lineTo(f.cc.x, f.cc.y);
       ctx.closePath();
-      ctx.fillStyle = 'rgba(242, 200, 75, ' + fillAlpha + ')';
+      ctx.fillStyle = 'rgba(123, 230, 240, ' + fillAlpha + ')';
       ctx.fill();
       ctx.lineWidth = 1.1;
-      ctx.strokeStyle = 'rgba(242, 200, 75, ' + strokeAlpha + ')';
+      ctx.strokeStyle = 'rgba(123, 230, 240, ' + strokeAlpha + ')';
       ctx.stroke();
     }
 
@@ -1254,10 +1254,10 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
       ctx.lineTo(bestFace.b.x, bestFace.b.y);
       ctx.lineTo(bestFace.cc.x, bestFace.cc.y);
       ctx.closePath();
-      ctx.strokeStyle = 'rgba(242, 200, 75, 0.85)';
+      ctx.strokeStyle = 'rgba(123, 230, 240, 0.85)';
       ctx.lineWidth = 1.6;
       ctx.stroke();
-      ctx.fillStyle = 'rgba(242, 200, 75, 0.08)';
+      ctx.fillStyle = 'rgba(123, 230, 240, 0.08)';
       ctx.fill();
       ctx.restore();
 
@@ -1267,8 +1267,8 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
       ctx.font = '600 ' + fontSize + 'px "Space Grotesk", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      if (settled && numToShow === 20) { ctx.shadowColor = 'rgba(242, 200, 75, 0.7)'; ctx.shadowBlur = 18; }
-      ctx.fillStyle = '#F2C84B';
+      if (settled && numToShow === 20) { ctx.shadowColor = 'rgba(123, 230, 240, 0.7)'; ctx.shadowBlur = 18; }
+      ctx.fillStyle = '#7BE6F0';
       ctx.fillText(String(numToShow), cxF, cyF + 1);
       ctx.restore();
     }
@@ -1297,7 +1297,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
       const ey = anchor.y - bounceY + Math.sin(ang) * reach;
       const ay = anchor.y - bounceY;
       const alpha = Math.min(1, 0.55 + arcIntensity * 0.4);
-      drawBolt(anchor.x, ay, ex, ey, 8, R * 0.18, 'rgba(242, 200, 75, ' + (0.22 * alpha) + ')', 5);
+      drawBolt(anchor.x, ay, ex, ey, 8, R * 0.18, 'rgba(123, 230, 240, ' + (0.22 * alpha) + ')', 5);
       drawBolt(anchor.x, ay, ex, ey, 10, R * 0.14, 'rgba(255, 220, 90, ' + (0.6 * alpha) + ')', 2.2);
       drawBolt(anchor.x, ay, ex, ey, 10, R * 0.10, 'rgba(255, 245, 200, ' + (0.95 * alpha) + ')', 1);
       ctx.save();
@@ -1313,9 +1313,9 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     if (!rolling) {
       const ringAlpha = 0.22 + 0.2 * Math.sin(now * 0.008);
       ctx.save();
-      ctx.strokeStyle = 'rgba(242, 200, 75, ' + ringAlpha + ')';
+      ctx.strokeStyle = 'rgba(123, 230, 240, ' + ringAlpha + ')';
       ctx.lineWidth = 1.2;
-      ctx.shadowColor = 'rgba(242, 200, 75, 0.7)';
+      ctx.shadowColor = 'rgba(123, 230, 240, 0.7)';
       ctx.shadowBlur = 12;
       ctx.beginPath();
       ctx.arc(cx, cy - bounceY, R * 1.05 + Math.sin(now * 0.005) * 2, 0, TAU);
@@ -1327,8 +1327,8 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         const sx = cx + Math.cos(a) * rr;
         const sy = cy - bounceY + Math.sin(a) * rr;
         ctx.save();
-        ctx.fillStyle = 'rgba(242, 200, 75, ' + (0.5 + 0.4 * Math.sin(now * 0.005 + i)) + ')';
-        ctx.shadowColor = '#F2C84B';
+        ctx.fillStyle = 'rgba(123, 230, 240, ' + (0.5 + 0.4 * Math.sin(now * 0.005 + i)) + ')';
+        ctx.shadowColor = '#7BE6F0';
         ctx.shadowBlur = 6;
         ctx.beginPath();
         ctx.arc(sx, sy, 1.2, 0, TAU);
@@ -1340,7 +1340,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     // circuit traces
     const pulse = (Math.sin(now * 0.002) + 1) / 2;
     ctx.save();
-    ctx.strokeStyle = 'rgba(242, 200, 75, 0.18)';
+    ctx.strokeStyle = 'rgba(123, 230, 240, 0.18)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(cx + R * 1.05, cy);
@@ -1348,7 +1348,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     ctx.lineTo(w - 30, cy + 60);
     ctx.lineTo(w - 12, cy + 60);
     ctx.stroke();
-    ctx.fillStyle = 'rgba(242, 200, 75, ' + (0.3 + pulse * 0.7) + ')';
+    ctx.fillStyle = 'rgba(123, 230, 240, ' + (0.3 + pulse * 0.7) + ')';
     ctx.beginPath();
     ctx.arc(w - 12, cy + 60, 3, 0, TAU);
     ctx.fill();
@@ -1358,7 +1358,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     ctx.lineTo(30, cy - 70);
     ctx.lineTo(12, cy - 70);
     ctx.stroke();
-    ctx.fillStyle = 'rgba(242, 200, 75, ' + (0.3 + (1 - pulse) * 0.7) + ')';
+    ctx.fillStyle = 'rgba(123, 230, 240, ' + (0.3 + (1 - pulse) * 0.7) + ')';
     ctx.beginPath();
     ctx.arc(12, cy - 70, 3, 0, TAU);
     ctx.fill();
