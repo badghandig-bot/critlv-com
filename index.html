@@ -1009,8 +1009,12 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
   });
 })();
 
-// ====== INDUSTRY MODAL + LEAD FORM ======
-(function () {
+// ====== INDUSTRY MODAL + LEAD FORM (v2 — DOMContentLoaded-safe) ======
+function ready(fn) {
+  if (document.readyState !== 'loading') fn();
+  else document.addEventListener('DOMContentLoaded', fn);
+}
+ready(function () {
   const INDUSTRY_CONTENT = {
     'residential': {
       title: 'Residential',
@@ -1136,10 +1140,17 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     document.body.classList.remove('modal-open');
   }
 
-  document.querySelectorAll('.industry[data-industry]').forEach(function (a) {
+  const tiles = document.querySelectorAll('.industry[data-industry]');
+  tiles.forEach(function (a) {
     a.addEventListener('click', function (e) {
       const industry = a.getAttribute('data-industry');
-      if (!industry || !INDUSTRY_CONTENT[industry]) return;
+      if (!industry) return;
+      if (!INDUSTRY_CONTENT[industry]) {
+        // Bail loudly rather than silently — surfaces the real bug if a tile
+        // ever gets added without a matching INDUSTRY_CONTENT entry.
+        console.warn('[critlv] No modal content for industry:', industry);
+        return;
+      }
       e.preventDefault();
       openModal(industry);
     });
@@ -1245,7 +1256,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
       }
     });
   }
-})();
+});
 
 // ====== D20 ROLLING DIE ANIMATION ======
 (function () {
