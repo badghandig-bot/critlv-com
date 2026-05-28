@@ -156,6 +156,9 @@ section { position: relative; }
 .project.span-2 { grid-row: span 2; }
 .project-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: var(--cyan); text-transform: uppercase; }
 .project-bg { position: absolute; inset: 0; opacity: 0.18; pointer-events: none; }
+img.project-bg { opacity: 0.55; object-fit: cover; object-position: center; width: 100%; height: 100%; }
+.project.photo::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 65%; background: linear-gradient(to top, rgba(6, 16, 31, 0.88) 10%, rgba(6, 16, 31, 0.55) 50%, transparent); pointer-events: none; z-index: 1; }
+.project.photo > div { position: relative; z-index: 2; }
 .project-video { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: #000; }
 .project-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .project h3 { font-size: 24px; margin-bottom: 8px; }
@@ -690,7 +693,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <span class="eyebrow">Field Work / 05</span>
         <h2 style="margin-top: 16px;">Recent installs.</h2>
       </div>
-      <p>A sample of jobs across the Triangle. Photos and full case studies available on request.</p>
+      <p>A sample of recent work across the Triangle. Full case studies and references available on request.</p>
     </div>
     <div class="projects-grid">
 
@@ -713,73 +716,58 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         </div>
       </div>
 
-      <div class="project">
-        <svg class="project-bg" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <defs><pattern id="stripe-2" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(123,230,240,0.5)" stroke-width="1"/></pattern></defs>
-          <rect width="400" height="320" fill="url(#stripe-2)"/>
-          <g fill="none" stroke="rgba(123,230,240,0.6)" stroke-width="1.4">
-            <rect x="280" y="60" width="60" height="40"/><rect x="280" y="110" width="60" height="40"/>
-          </g>
-        </svg>
-        <div style="position: relative;">
-          <div class="project-tag">CAMPUS</div>
+      <div class="project photo">
+        <img class="project-bg" src="assets/projects/office-network-buildout.jpg" alt="Office network rack buildout — patch panel, switch and PDU in a wall-mounted enclosure" loading="lazy"/>
+        <div>
+          <div class="project-tag">COMMERCIAL</div>
         </div>
-        <div style="position: relative;">
-          <h3>Charter School Network</h3>
+        <div>
+          <h3>Office network buildout</h3>
           <div class="project-meta">
-            <span>SITES <b>8</b></span>
-            <span>YEAR <b>2024</b></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project">
-        <svg class="project-bg" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <defs><pattern id="stripe-3" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(123,230,240,0.5)" stroke-width="1"/></pattern></defs>
-          <rect width="400" height="320" fill="url(#stripe-3)"/>
-        </svg>
-        <div style="position: relative;">
-          <div class="project-tag">INDUSTRIAL</div>
-        </div>
-        <div style="position: relative;">
-          <h3>Logistics DC, Garner</h3>
-          <div class="project-meta">
-            <span>CAMERAS <b>142</b></span>
+            <span>TYPE <b>Cat6 + rack</b></span>
             <span>YEAR <b>2025</b></span>
           </div>
         </div>
       </div>
 
-      <div class="project">
-        <svg class="project-bg" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <defs><pattern id="stripe-4" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(123,230,240,0.5)" stroke-width="1"/></pattern></defs>
-          <rect width="400" height="320" fill="url(#stripe-4)"/>
-        </svg>
-        <div style="position: relative;">
-          <div class="project-tag">HEALTHCARE</div>
+      <div class="project photo">
+        <img class="project-bg" src="assets/projects/new-construction-cabling.jpg" alt="New construction low-voltage rough-in — green Cat6 bundles dropping from ceiling into the telecom closet" loading="lazy"/>
+        <div>
+          <div class="project-tag">NEW BUILD</div>
         </div>
-        <div style="position: relative;">
-          <h3>Outpatient Imaging Center</h3>
+        <div>
+          <h3>New construction cabling</h3>
           <div class="project-meta">
-            <span>MDF <b>2</b></span>
-            <span>IDF <b>4</b></span>
+            <span>TYPE <b>Cat6 rough-in</b></span>
+            <span>YEAR <b>2025</b></span>
           </div>
         </div>
       </div>
 
-      <div class="project">
-        <svg class="project-bg" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <defs><pattern id="stripe-5" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(123,230,240,0.5)" stroke-width="1"/></pattern></defs>
-          <rect width="400" height="320" fill="url(#stripe-5)"/>
-        </svg>
-        <div style="position: relative;">
-          <div class="project-tag">HOSPITALITY</div>
+      <div class="project photo">
+        <img class="project-bg" src="assets/projects/dental-practice-server.jpg" alt="Dental practice server install — Dell EMC server rack and Tripp-Lite PDU" loading="lazy"/>
+        <div>
+          <div class="project-tag">HEALTHCARE</div>
         </div>
-        <div style="position: relative;">
-          <h3>Boutique Hotel &mdash; Durham</h3>
+        <div>
+          <h3>Dental practice server</h3>
           <div class="project-meta">
-            <span>ROOMS <b>96</b></span>
-            <span>AV ZONES <b>7</b></span>
+            <span>TYPE <b>Server + cabling</b></span>
+            <span>YEAR <b>2025</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project photo">
+        <img class="project-bg" src="assets/projects/small-business-network.jpg" alt="Small business network — wall-mounted rack with Leviton patch panels and Cisco switch" loading="lazy"/>
+        <div>
+          <div class="project-tag">OFFICE</div>
+        </div>
+        <div>
+          <h3>Small business network</h3>
+          <div class="project-meta">
+            <span>TYPE <b>Cat6 + Cisco</b></span>
+            <span>YEAR <b>2024</b></span>
           </div>
         </div>
       </div>
