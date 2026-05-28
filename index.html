@@ -187,6 +187,34 @@ img.project-bg { opacity: 0.55; object-fit: cover; object-position: center; widt
 .textarea { resize: vertical; min-height: 110px; font-family: inherit; }
 .label { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; color: var(--ink-3); text-transform: uppercase; margin-bottom: 6px; display: block; }
 .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.help-text { font-size: 12px; color: var(--ink-3); margin-top: -8px; margin-bottom: 4px; }
+.cabling-details { display: none; padding: 20px; border: 1px dashed var(--line-strong); border-radius: var(--r); background: rgba(242, 200, 75, 0.04); gap: 14px; }
+.cabling-details.show { display: grid; }
+.cabling-details h4 { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; color: var(--cyan); text-transform: uppercase; margin: 0 0 4px; font-weight: 500; }
+.checkbox-row { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-size: 14px; cursor: pointer; padding: 6px 0; }
+.checkbox-row input { width: 16px; height: 16px; accent-color: var(--cyan); cursor: pointer; }
+.form-error { background: rgba(242, 107, 75, 0.1); border: 1px solid rgba(242, 107, 75, 0.4); color: #F26B4B; padding: 12px 16px; border-radius: var(--r-sm); font-size: 14px; }
+
+/* MODAL */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(6, 16, 31, 0.86); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: opacity .22s, visibility .22s; }
+.modal-backdrop.open { opacity: 1; visibility: visible; }
+.modal-card { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: var(--r-lg); padding: 40px 40px 32px; max-width: 620px; width: 100%; max-height: 86vh; overflow-y: auto; transform: translateY(16px); transition: transform .25s; position: relative; }
+.modal-backdrop.open .modal-card { transform: translateY(0); }
+.modal-close { position: absolute; top: 18px; right: 18px; background: transparent; border: 1px solid var(--line); color: var(--ink-2); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; padding: 0; }
+.modal-close:hover { border-color: var(--cyan); color: var(--cyan); }
+.modal-card h3 { font-size: 26px; margin-bottom: 10px; line-height: 1.2; }
+.modal-card .eyebrow { display: inline-block; margin-bottom: 18px; }
+.modal-card p.modal-intro { color: var(--ink-2); margin-bottom: 18px; font-size: 15px; line-height: 1.6; }
+.modal-bullets { display: grid; gap: 10px; margin: 20px 0 28px; padding: 0; list-style: none; }
+.modal-bullets li { display: flex; gap: 12px; align-items: flex-start; color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+.modal-bullets li::before { content: ""; flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); margin-top: 8px; }
+.modal-card .btn { width: 100%; justify-content: center; padding: 14px 24px; }
+body.modal-open { overflow: hidden; }
+
+@media (max-width: 640px) {
+  .modal-card { padding: 28px 22px 24px; max-height: 92vh; }
+  .modal-card h3 { font-size: 22px; }
+}
 
 /* FOOTER */
 footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64px 0 32px; }
@@ -570,7 +598,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     </div>
     <div class="industries-grid">
 
-      <a class="industry" href="#contact">
+      <a class="industry" href="#contact" data-industry="corporate-office">
         <div class="industry-icon">
           <svg viewBox="0 0 28 28" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.3">
             <rect x="5" y="4" width="18" height="20"/>
@@ -584,7 +612,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <div class="ind-meta">TENANT FIT-UPS</div>
       </a>
 
-      <a class="industry" href="#contact">
+      <a class="industry" href="#contact" data-industry="healthcare">
         <div class="industry-icon">
           <svg viewBox="0 0 28 28" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.3">
             <rect x="5" y="6" width="18" height="18"/>
@@ -596,7 +624,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <div class="ind-meta">HIPAA-AWARE</div>
       </a>
 
-      <a class="industry" href="#contact">
+      <a class="industry" href="#contact" data-industry="education">
         <div class="industry-icon">
           <svg viewBox="0 0 28 28" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.3">
             <path d="M3 10 L14 5 L25 10 L14 15 Z"/>
@@ -608,7 +636,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <div class="ind-meta">K-12 / HIGHER ED</div>
       </a>
 
-      <a class="industry" href="#contact">
+      <a class="industry" href="#contact" data-industry="industrial-warehouse">
         <div class="industry-icon">
           <svg viewBox="0 0 28 28" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.3">
             <path d="M3 23 V12 L11 16 V12 L19 16 V8 L25 12 V23 Z"/>
@@ -621,7 +649,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <div class="ind-meta">HARSH ENVIRONMENT</div>
       </a>
 
-      <a class="industry" href="#contact">
+      <a class="industry" href="#contact" data-industry="retail-restaurants">
         <div class="industry-icon">
           <svg viewBox="0 0 28 28" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.3">
             <path d="M5 9 L7 5 H21 L23 9"/>
@@ -633,7 +661,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <div class="ind-meta">MULTI-SITE</div>
       </a>
 
-      <a class="industry" href="#contact">
+      <a class="industry" href="#contact" data-industry="hospitality">
         <div class="industry-icon">
           <svg viewBox="0 0 28 28" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.3">
             <path d="M4 22 V13 H24 V22"/>
@@ -646,7 +674,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <div class="ind-meta">GUEST + BOH</div>
       </a>
 
-      <a class="industry" href="#contact">
+      <a class="industry" href="#contact" data-industry="residential">
         <div class="industry-icon">
           <svg viewBox="0 0 28 28" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.3">
             <path d="M4 13 L14 5 L24 13"/>
@@ -813,41 +841,97 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
 
       <div class="cta-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <h3 style="font-size: 20px;">Request a site walk</h3>
+          <h3 style="font-size: 20px;">Request a quote</h3>
           <span class="pill"><span class="dot"></span>Avail. this week</span>
         </div>
-        <form class="contact-form" id="contact-form">
-          <div class="row-2">
-            <div><label class="label">Name</label><input class="input" required placeholder="Your name"/></div>
-            <div><label class="label">Company</label><input class="input" placeholder="Company"/></div>
-          </div>
-          <div class="row-2">
-            <div><label class="label">Email</label><input class="input" type="email" required placeholder="you@company.com"/></div>
-            <div><label class="label">Phone</label><input class="input" placeholder="(555) 555-0100"/></div>
-          </div>
+        <form class="contact-form" id="lead-form" novalidate>
+          <input type="hidden" name="industrySource" id="lead-industry"/>
+
           <div>
-            <label class="label">Scope</label>
-            <select class="select" required>
-              <option value="" disabled selected>Select scope&hellip;</option>
-              <option>Structured cabling</option>
-              <option>Surveillance / cameras</option>
-              <option>Access control</option>
-              <option>AV / paging</option>
-              <option>Multiple / not sure</option>
+            <label class="label" for="lead-service">What are you looking for?</label>
+            <select class="select" id="lead-service" name="serviceCategory" required>
+              <option value="" disabled selected>Select what you need&hellip;</option>
+              <option value="STRUCTURED_CABLING">Structured cabling (Cat6 / Cat6A drops)</option>
+              <option value="VIDEO_SURVEILLANCE">IP cameras / NVR</option>
+              <option value="SMART_HOME">Smart home / IoT</option>
+              <option value="AV_PAGING">AV / paging</option>
+              <option value="NEW_CONSTRUCTION">New construction low-voltage</option>
+              <option value="SERVICE_MAINTENANCE">Service / repair on existing system</option>
+              <option value="SITE_WALK">Just a site walk to discuss</option>
+              <option value="OTHER">Other / not sure yet</option>
             </select>
           </div>
-          <div>
-            <label class="label">Tell us about the project</label>
-            <textarea class="textarea" placeholder="Address, square footage, target date, anything we should know&hellip;"></textarea>
+
+          <div class="row-2">
+            <div><label class="label" for="lead-name">Name</label><input class="input" id="lead-name" name="name" required autocomplete="name" placeholder="Your name"/></div>
+            <div><label class="label" for="lead-company">Company (optional)</label><input class="input" id="lead-company" name="company" autocomplete="organization" placeholder="Company"/></div>
           </div>
-          <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+
+          <div class="row-2">
+            <div><label class="label" for="lead-email">Email</label><input class="input" id="lead-email" name="email" type="email" required autocomplete="email" placeholder="you@example.com"/></div>
+            <div><label class="label" for="lead-phone">Phone</label><input class="input" id="lead-phone" name="phone" type="tel" required autocomplete="tel" placeholder="(919) 555-0100"/></div>
+          </div>
+
+          <div id="cabling-details" class="cabling-details">
+            <h4>Structured cabling details (optional)</h4>
+            <p class="help-text">The more we know up front, the more accurate the quote.</p>
+            <div class="row-2">
+              <div><label class="label" for="cab-building">Building type</label><input class="input" id="cab-building" name="cab-building" placeholder="Office, warehouse, clinic, home&hellip;"/></div>
+              <div><label class="label" for="cab-sqft">Approx. sq ft</label><input class="input" id="cab-sqft" name="cab-sqft" type="number" min="0" placeholder="e.g. 5000"/></div>
+            </div>
+            <div class="row-2">
+              <div><label class="label" for="cab-drops">Approx. drops</label><input class="input" id="cab-drops" name="cab-drops" type="number" min="0" placeholder="e.g. 40"/></div>
+              <div><label class="label" for="cab-closets">MDF / IDF closets</label><input class="input" id="cab-closets" name="cab-closets" type="number" min="0" placeholder="e.g. 1"/></div>
+            </div>
+            <div class="row-2">
+              <div>
+                <label class="label" for="cab-ceiling">Ceiling height</label>
+                <select class="select" id="cab-ceiling" name="cab-ceiling">
+                  <option value="">Select&hellip;</option>
+                  <option value="8-10ft">8&ndash;10 ft</option>
+                  <option value="10-15ft">10&ndash;15 ft</option>
+                  <option value="15-20ft">15&ndash;20 ft</option>
+                  <option value="20ft+">20 ft +</option>
+                  <option value="unknown">Not sure</option>
+                </select>
+              </div>
+              <div>
+                <label class="label" for="cab-deadline">Deadline</label>
+                <select class="select" id="cab-deadline" name="cab-deadline">
+                  <option value="">Select&hellip;</option>
+                  <option value="asap">ASAP</option>
+                  <option value="within-4-weeks">Within 4 weeks</option>
+                  <option value="within-8-weeks">Within 8 weeks</option>
+                  <option value="3-plus-months">3+ months</option>
+                  <option value="no-deadline">No firm deadline</option>
+                </select>
+              </div>
+            </div>
+            <label class="checkbox-row" for="cab-newconstruction">
+              <input type="checkbox" id="cab-newconstruction" name="cab-newconstruction"/>
+              <span>This is new construction (rough-in before drywall)</span>
+            </label>
+            <div>
+              <label class="label" for="cab-special">Special requirements</label>
+              <textarea class="textarea" id="cab-special" name="cab-special" placeholder="Outdoor runs, plenum, riser, special enclosures, anything else&hellip;" style="min-height: 80px;"></textarea>
+            </div>
+          </div>
+
+          <div>
+            <label class="label" for="lead-description">Tell us about the project</label>
+            <textarea class="textarea" id="lead-description" name="description" placeholder="Address, target date, budget if you have one, anything else&hellip;"></textarea>
+          </div>
+
+          <div id="lead-error" class="form-error" style="display:none;" role="alert"></div>
+
+          <button type="submit" class="btn btn-primary" id="lead-submit" style="margin-top: 8px;">
             Send request
             <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
           </button>
         </form>
-        <div id="contact-success" style="display:none; padding: 40px 0; text-align: center; color: var(--ink-2);">
-          <div style="font-size: 24px; color: var(--cyan); margin-bottom: 12px;">&check; Request sent</div>
-          <p style="font-size: 14px;">We&rsquo;ll reach out within one business day.</p>
+        <div id="lead-success" style="display:none; padding: 40px 0; text-align: center; color: var(--ink-2);">
+          <div style="font-size: 24px; color: var(--cyan); margin-bottom: 12px;">&check; Request received</div>
+          <p style="font-size: 14px;">Ryan or Juan will reach out within one business day. For urgent work, call <a href="tel:+17543480736" style="color: var(--cyan);">(754) 348&#8209;0736</a>.</p>
         </div>
       </div>
     </div>
@@ -925,16 +1009,242 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
   });
 })();
 
-// ====== CONTACT FORM ======
+// ====== INDUSTRY MODAL + LEAD FORM ======
 (function () {
-  const form = document.getElementById('contact-form');
-  const success = document.getElementById('contact-success');
-  if (!form) return;
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    form.style.display = 'none';
-    success.style.display = 'block';
+  const INDUSTRY_CONTENT = {
+    'residential': {
+      title: 'Residential',
+      intro: "CRIT covers the wired bones of a modern home — Cat6 backbones for AV and IoT, smart-home installs, security cameras, paging, and AV cabling.",
+      bullets: [
+        'Whole-home Cat6 / Cat6A pre-wires for new construction and retrofits',
+        'Smart-home device installs and networking — Wi-Fi mesh, hubs, controllers',
+        'AV cabling: speakers, projectors, distributed audio',
+        'IP camera install and NVR programming (motion zones, alerts, remote view)',
+        'IoT installs and integration',
+        'Troubleshooting and repair on existing systems',
+      ],
+    },
+    'corporate-office': {
+      title: 'Corporate & Office',
+      intro: 'Tenant fit-ups, HQ relocations, and additions to existing cable plants for offices across the Triangle.',
+      bullets: [
+        'Cat5e, Cat6, and Cat6A cabling for tenant fit-ups',
+        'Network closet builds: patch panels, racks, cable management',
+        'IP camera systems with NVR install and programming',
+        'Conference-room AV cabling and small-room AV',
+        'Documentation handoff: photos plus topology and network maps',
+        '24/7 emergency response after install',
+      ],
+    },
+    'healthcare': {
+      title: 'Healthcare',
+      intro: 'Small clinics, dental practices, and outpatient builds. We work alongside whatever HIPAA compliance program your practice already runs.',
+      bullets: [
+        'Cat6 / Cat6A cabling for clinic and practice fit-ups',
+        'IP camera systems with NVR (waiting rooms, exterior, parking)',
+        'Server install (Dell, HP, etc.) with PDU and cable management',
+        'New-construction low-voltage rough-in for medical office buildings',
+        'Documentation handoff: photos plus topology and network maps',
+        'HIPAA-aware install practices, working with your existing program',
+      ],
+    },
+    'education': {
+      title: 'Education',
+      intro: 'K–12 and small private school installs, plus tutoring centers and learning-center fit-ups.',
+      bullets: [
+        'Cat6 / Cat6A drops for classrooms, offices, and labs',
+        'Classroom AV cabling: projectors, displays, smart boards',
+        'IP camera systems with NVR (hallways, exteriors, entries)',
+        'Network closet builds for small to mid-sized schools',
+        'New-construction low-voltage rough-in for school additions',
+        'Quick-turn project work that fits around the academic calendar',
+      ],
+    },
+    'industrial-warehouse': {
+      title: 'Industrial / Warehouse',
+      intro: 'Harder environments: warehouse floors, loading docks, mezzanines, and plenum or outdoor runs.',
+      bullets: [
+        'Plenum-rated and outdoor-rated cable for tough environments',
+        'IP camera systems with NVR for loading docks, perimeter, interior',
+        'Network drops to mezzanines, floor offices, and break rooms',
+        'Cable management built for industrial maintenance access',
+        'IoT controller installs for warehouse automation',
+        'Documentation that survives shift changes',
+      ],
+    },
+    'retail-restaurants': {
+      title: 'Retail & Restaurants',
+      intro: 'Multi-site rollouts within the Triangle plus single-store fit-ups and remodels.',
+      bullets: [
+        'POS network cabling and patch-panel work',
+        'IP camera systems with NVR (counter, kitchen, exterior)',
+        'Music and paging system wiring',
+        'Cat6 drops to ceiling-mount APs and digital signage',
+        'Quick-turn store opening and remodel punch-list work',
+        'Multi-store rollouts coordinated across Triangle locations',
+      ],
+    },
+    'hospitality': {
+      title: 'Hospitality',
+      intro: 'Back-of-house network, guest network architecture for small properties, and AV for meeting rooms.',
+      bullets: [
+        'Back-of-house Cat6 / Cat6A for staff network',
+        'Guest network low-voltage for small and boutique properties',
+        'IP camera systems with NVR (lobby, entries, perimeter)',
+        'AV cabling for meeting rooms and banquet spaces',
+        'Owner-direct buildouts (not large-chain ownership groups)',
+        'Documentation and labeling for hand-off to property IT',
+      ],
+    },
+  };
+
+  // --- MODAL WIRING -------------------------------------------------------
+  const modal = document.getElementById('industry-modal');
+  const modalTitle = document.getElementById('modal-title');
+  const modalIntro = document.getElementById('modal-intro');
+  const modalBullets = document.getElementById('modal-bullets');
+  const modalEyebrow = document.getElementById('modal-eyebrow');
+  const modalCta = document.getElementById('modal-cta');
+  const modalClose = document.getElementById('modal-close');
+  const industryInput = document.getElementById('lead-industry');
+  let currentIndustry = null;
+
+  function openModal(industry) {
+    const content = INDUSTRY_CONTENT[industry];
+    if (!content || !modal) return;
+    currentIndustry = industry;
+    if (modalEyebrow) modalEyebrow.textContent = 'What we do · ' + content.title;
+    if (modalTitle) modalTitle.textContent = content.title;
+    if (modalIntro) modalIntro.textContent = content.intro;
+    if (modalBullets) {
+      modalBullets.innerHTML = '';
+      content.bullets.forEach(function (b) {
+        const li = document.createElement('li');
+        li.textContent = b;
+        modalBullets.appendChild(li);
+      });
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  document.querySelectorAll('.industry[data-industry]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      const industry = a.getAttribute('data-industry');
+      if (!industry || !INDUSTRY_CONTENT[industry]) return;
+      e.preventDefault();
+      openModal(industry);
+    });
   });
+
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
+  });
+
+  if (modalCta) {
+    modalCta.addEventListener('click', function () {
+      if (currentIndustry && industryInput) industryInput.value = currentIndustry;
+      closeModal();
+      const contact = document.getElementById('contact');
+      if (contact) contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  // --- CABLING DETAILS TOGGLE --------------------------------------------
+  const serviceSelect = document.getElementById('lead-service');
+  const cablingDetails = document.getElementById('cabling-details');
+  if (serviceSelect && cablingDetails) {
+    serviceSelect.addEventListener('change', function () {
+      if (serviceSelect.value === 'STRUCTURED_CABLING') {
+        cablingDetails.classList.add('show');
+      } else {
+        cablingDetails.classList.remove('show');
+      }
+    });
+  }
+
+  // --- LEAD FORM SUBMIT --------------------------------------------------
+  const form = document.getElementById('lead-form');
+  const successDiv = document.getElementById('lead-success');
+  const errorDiv = document.getElementById('lead-error');
+  const submitBtn = document.getElementById('lead-submit');
+
+  if (form && successDiv && errorDiv && submitBtn) {
+    const originalLabel = submitBtn.innerHTML;
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      errorDiv.style.display = 'none';
+      errorDiv.textContent = '';
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Sending…';
+
+      const fd = new FormData(form);
+      const serviceCategory = String(fd.get('serviceCategory') || '');
+      const payload = {
+        name: String(fd.get('name') || '').trim(),
+        email: String(fd.get('email') || '').trim(),
+        phone: String(fd.get('phone') || '').trim(),
+        company: String(fd.get('company') || '').trim(),
+        serviceCategory: serviceCategory,
+        industrySource: String(fd.get('industrySource') || '').trim() || null,
+        description: String(fd.get('description') || '').trim(),
+      };
+
+      if (serviceCategory === 'STRUCTURED_CABLING') {
+        const cab = {};
+        const buildingType = String(fd.get('cab-building') || '').trim();
+        const sqft = String(fd.get('cab-sqft') || '').trim();
+        const drops = String(fd.get('cab-drops') || '').trim();
+        const closets = String(fd.get('cab-closets') || '').trim();
+        const ceiling = String(fd.get('cab-ceiling') || '').trim();
+        const deadline = String(fd.get('cab-deadline') || '').trim();
+        const special = String(fd.get('cab-special') || '').trim();
+        const isNew = fd.get('cab-newconstruction') === 'on';
+        if (buildingType) cab.buildingType = buildingType;
+        if (sqft) cab.approximateSqFt = parseInt(sqft, 10);
+        if (drops) cab.approximateDrops = parseInt(drops, 10);
+        if (closets) cab.numClosets = parseInt(closets, 10);
+        if (ceiling) cab.ceilingHeight = ceiling;
+        if (deadline) cab.deadlineWeeks = deadline;
+        if (special) cab.specialRequirements = special;
+        if (isNew) cab.isNewConstruction = true;
+        if (Object.keys(cab).length > 0) payload.cablingDetails = cab;
+      }
+
+      try {
+        const res = await fetch('https://app.critlv.com/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          let msg = 'Could not send. Please try again or call (754) 348-0736.';
+          try {
+            const data = await res.json();
+            if (data && data.error) msg = data.error;
+          } catch (e2) {}
+          throw new Error(msg);
+        }
+        form.style.display = 'none';
+        successDiv.style.display = 'block';
+      } catch (err) {
+        errorDiv.textContent = err && err.message ? err.message : 'Could not send. Please try again.';
+        errorDiv.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalLabel;
+      }
+    });
+  }
 })();
 
 // ====== D20 ROLLING DIE ANIMATION ======
@@ -1330,6 +1640,23 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
   ro.observe(c);
 })();
 </script>
+
+<!-- ============ INDUSTRY MODAL ============ -->
+<div class="modal-backdrop" id="industry-modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+  <div class="modal-card">
+    <button class="modal-close" type="button" aria-label="Close" id="modal-close">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+    <span class="eyebrow" id="modal-eyebrow">What we do</span>
+    <h3 id="modal-title">Industry</h3>
+    <p class="modal-intro" id="modal-intro"></p>
+    <ul class="modal-bullets" id="modal-bullets"></ul>
+    <button class="btn btn-primary" type="button" id="modal-cta">
+      Request a quote
+      <svg class="arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8 H13 M9 4 L13 8 L9 12"/></svg>
+    </button>
+  </div>
+</div>
 
 </body>
 </html>
