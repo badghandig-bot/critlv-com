@@ -125,6 +125,14 @@ footer { padding: 24px; text-align: center; font-size: 12px; color: var(--ink-3)
 footer a { color: var(--cyan); }
 
 .section-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: var(--ink-2); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
+
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+@media (max-width: 560px) { .choice-grid { grid-template-columns: 1fr; } }
+.choice-btn { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: var(--r); padding: 18px; text-align: left; cursor: pointer; transition: all .15s; font-family: inherit; color: var(--ink); }
+.choice-btn:hover { border-color: var(--cyan); transform: translateY(-1px); }
+.choice-btn .choice-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: #fff; font-weight: 600; margin-bottom: 4px; }
+.choice-btn .choice-desc { font-size: 13px; color: var(--ink-2); margin-bottom: 8px; line-height: 1.4; }
+.choice-btn .choice-dur { font-size: 11px; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
 .spinner { width: 14px; height: 14px; border: 2px solid var(--line-strong); border-top-color: var(--cyan); border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -171,6 +179,28 @@ footer a { color: var(--cyan); }
         <div id="code-error" class="alert error" hidden></div>
         <button type="submit" id="btn-check" class="btn btn-primary" style="margin-top:18px;">Check code</button>
       </form>
+    </section>
+
+    <!-- STEP 1.5: Pick reward (only for any-reward batches) -->
+    <section id="step-pick" hidden>
+      <button type="button" class="back-link" id="btn-back-to-code-from-pick">← Different code</button>
+
+      <div class="card">
+        <div class="reward-head">
+          <div class="reward-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/></svg>
+          </div>
+          <div class="reward-meta">
+            <div class="label">Pick your reward</div>
+            <div class="title">What would you like?</div>
+          </div>
+          <span class="code-pill" id="pick-code">—</span>
+        </div>
+        <p class="reward-desc">This code lets you pick any of the services below. Choose what&rsquo;s most useful — we&rsquo;ll book a real slot after.</p>
+        <div class="reward-blurb" id="pick-blurb" hidden></div>
+      </div>
+
+      <div class="choice-grid" id="choice-grid"></div>
     </section>
 
     <!-- STEP 2: Book -->
@@ -266,7 +296,11 @@ footer a { color: var(--cyan); }
   const hide = (id) => { const el = $(id); if (el) el.hidden = true; };
   const setText = (id, text) => { const el = $(id); if (el) el.textContent = text; };
 
-  let validCode = null; // { code, batchId, rewardLabel, rewardDescription, durationMinutes, customerBlurb }
+  // For single-reward batches: rewardKey stays null (server uses batch.reward).
+  // For any-reward batches: rewardKey is the customer's pick.
+  // validCode shape: { code, batchId, rewardKey, rewardLabel, rewardDescription, durationMinutes, customerBlurb }
+  let validCode = null;
+  let anyBatch = null;  // { code, batchId, customerBlurb, choices }
   let pickedSlot = null; // ISO string
 
   // -------- Step 1 → 2 --------
@@ -292,8 +326,13 @@ footer a { color: var(--cyan); }
         show("code-error");
         return;
       }
-      validCode = json.data;
-      enterBookStep();
+      if (json.data.allowsAnyReward) {
+        anyBatch = json.data;
+        enterPickStep();
+      } else {
+        validCode = Object.assign({ rewardKey: null }, json.data);
+        enterBookStep();
+      }
     } catch (err) {
       $("code-error").textContent = err.message || "Couldn't reach the server. Try again?";
       show("code-error");
@@ -304,12 +343,72 @@ footer a { color: var(--cyan); }
   });
 
   $("btn-back-to-code").addEventListener("click", () => {
+    // From book step: if we came via the picker, go back there; else to code.
+    if (anyBatch) {
+      validCode = null;
+      pickedSlot = null;
+      hide("step-book");
+      show("step-pick");
+    } else {
+      resetToCode();
+    }
+  });
+
+  $("btn-back-to-code-from-pick").addEventListener("click", resetToCode);
+
+  function resetToCode() {
     validCode = null;
+    anyBatch = null;
     pickedSlot = null;
+    hide("step-pick");
     hide("step-book");
     show("step-code");
     $("code").focus();
-  });
+  }
+
+  function enterPickStep() {
+    setText("pick-code", anyBatch.code);
+    if (anyBatch.customerBlurb) {
+      setText("pick-blurb", anyBatch.customerBlurb);
+      show("pick-blurb");
+    } else {
+      hide("pick-blurb");
+    }
+    const grid = $("choice-grid");
+    grid.innerHTML = "";
+    for (const c of anyBatch.choices) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice-btn";
+      btn.innerHTML = `
+        <div class="choice-title">${escapeHtml(c.label)}</div>
+        <div class="choice-desc">${escapeHtml(c.description)}</div>
+        <div class="choice-dur">≈ ${c.durationMinutes} min on-site</div>
+      `;
+      btn.addEventListener("click", () => {
+        validCode = {
+          code: anyBatch.code,
+          batchId: anyBatch.batchId,
+          rewardKey: c.value,
+          rewardLabel: c.label,
+          rewardDescription: c.description,
+          durationMinutes: c.durationMinutes,
+          customerBlurb: anyBatch.customerBlurb,
+        };
+        hide("step-pick");
+        enterBookStep();
+      });
+      grid.appendChild(btn);
+    }
+    hide("step-code");
+    show("step-pick");
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement("div");
+    div.textContent = s ?? "";
+    return div.innerHTML;
+  }
 
   function enterBookStep() {
     setText("reward-title", validCode.rewardLabel);
@@ -335,7 +434,8 @@ footer a { color: var(--cyan); }
     $("slots-container").innerHTML = "";
     hide("slot-tz-note");
     try {
-      const url = `${API_BASE}/slots?batchId=${encodeURIComponent(validCode.batchId)}&days=14`;
+      let url = `${API_BASE}/slots?batchId=${encodeURIComponent(validCode.batchId)}&days=14`;
+      if (validCode.rewardKey) url += `&reward=${encodeURIComponent(validCode.rewardKey)}`;
       const res = await fetch(url);
       const json = await res.json();
       hide("slots-loading");
@@ -419,6 +519,7 @@ footer a { color: var(--cyan); }
         body: JSON.stringify({
           code: validCode.code,
           scheduledFor: pickedSlot,
+          reward: validCode.rewardKey || undefined,
           customer: {
             name: $("name").value.trim(),
             email: $("email").value.trim(),
