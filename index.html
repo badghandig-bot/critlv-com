@@ -938,6 +938,100 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
   </div>
 </section>
 
+<!-- ============ REDEEM BANNER ============ -->
+<!-- Coupon-redemption CTA. Intentionally below the full pitch so visitors see
+     the actual capability set before they consider claiming a freebie. Links
+     out to /redeem.html (vanilla form that posts cross-origin to app.critlv.com). -->
+<section class="section" id="redeem" style="background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%); border-top: 1px solid var(--line);">
+  <div class="container">
+    <div class="redeem-banner">
+      <div class="redeem-left">
+        <span class="eyebrow">Special offers / 07</span>
+        <h2 style="margin-top: 18px; margin-bottom: 18px;">
+          Got a <em style="color: var(--cyan); font-style: normal;">coupon code</em>?
+        </h2>
+        <p style="color: var(--ink-2); font-size: 17px; max-width: 520px; margin-bottom: 24px;">
+          If we handed you a card, sent you a postcard, or you got a code from one of
+          our partners &mdash; redeem it here for a free service. Network closet grading,
+          WiFi survey, drop check, or camera checkup. No payment, no obligation.
+        </p>
+        <ul class="redeem-perks" style="list-style: none; padding: 0; margin-bottom: 28px;">
+          <li>One-time use, real value &mdash; not a marketing trick</li>
+          <li>Book your slot in 30 seconds, on your schedule</li>
+          <li>We confirm by email before we show up</li>
+        </ul>
+        <a href="/redeem.html" class="btn btn-primary" style="font-size: 15px; padding: 14px 28px;">
+          Redeem your code
+          <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7 H12 M8 3 L12 7 L8 11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div style="margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase;">
+          No code? Use the quote form above.
+        </div>
+      </div>
+
+      <div class="redeem-right">
+        <div class="redeem-card">
+          <div class="redeem-card-label">What you can redeem</div>
+          <div class="redeem-rewards">
+            <div class="redeem-reward-row">
+              <div class="redeem-reward-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+              </div>
+              <div>
+                <div class="redeem-reward-title">Network closet grading</div>
+                <div class="redeem-reward-desc">Walk-through + written grade in 60 min.</div>
+              </div>
+            </div>
+            <div class="redeem-reward-row">
+              <div class="redeem-reward-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12 L22 12 M12 2 a15 15 0 0 1 0 20 a15 15 0 0 1 0 -20"/></svg>
+              </div>
+              <div>
+                <div class="redeem-reward-title">WiFi survey</div>
+                <div class="redeem-reward-desc">Heatmap your space, find dead spots.</div>
+              </div>
+            </div>
+            <div class="redeem-reward-row">
+              <div class="redeem-reward-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v10H4z"/><path d="M8 7v10 M12 7v10 M16 7v10"/></svg>
+              </div>
+              <div>
+                <div class="redeem-reward-title">2&ndash;3 drop network check</div>
+                <div class="redeem-reward-desc">Test up to 3 existing Cat6 drops to spec.</div>
+              </div>
+            </div>
+            <div class="redeem-reward-row">
+              <div class="redeem-reward-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10 L22 7 L22 17 L16 14 Z"/></svg>
+              </div>
+              <div>
+                <div class="redeem-reward-title">Camera system checkup</div>
+                <div class="redeem-reward-desc">Coverage gaps, dead cameras, NVR health.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.redeem-banner { display: grid; grid-template-columns: 1.2fr 1fr; gap: 56px; align-items: center; }
+.redeem-perks li { color: var(--ink-2); font-size: 14px; padding-left: 22px; position: relative; padding-bottom: 8px; }
+.redeem-perks li::before { content: "✓"; color: var(--cyan); position: absolute; left: 0; font-weight: 600; }
+.redeem-card { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: var(--r-lg); padding: 28px; }
+.redeem-card-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-3); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 18px; }
+.redeem-rewards { display: flex; flex-direction: column; gap: 16px; }
+.redeem-reward-row { display: flex; gap: 14px; align-items: flex-start; }
+.redeem-reward-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(242, 200, 75, 0.1); color: var(--cyan); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.redeem-reward-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 3px; }
+.redeem-reward-desc { font-size: 13px; color: var(--ink-2); }
+@media (max-width: 768px) {
+  .redeem-banner { grid-template-columns: 1fr; gap: 32px; }
+}
+</style>
+
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="container">
