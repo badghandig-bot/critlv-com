@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>NetSurvey — Blueprint &amp; Drop Estimator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink:   { 900:'#0b0f17', 800:'#111726', 700:'#1a2233', 600:'#232d42' },
+          line:  '#2c3a55',
+          accent:{ DEFAULT:'#3b82f6', soft:'#1d4ed8' },
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  /* SVG workspace fills its container; touch-action none so we own all gestures */
+  #viewport { touch-action: none; cursor: grab; }
+  #viewport.panning { cursor: grabbing; }
+  .seg-active { background:#3b82f6; color:#fff; }
+  .toolbtn.active, .ttoolbtn.active, .assetbtn.active { background:#3b82f6; color:#fff; }
+  .tool-btn[disabled] { opacity:.35; cursor:not-allowed; }
+  /* thin scrollbars in panels */
+  .scroll::-webkit-scrollbar{width:8px;height:8px}
+  .scroll::-webkit-scrollbar-thumb{background:#2c3a55;border-radius:4px}
+</style>
+</head>
+
+<body class="bg-ink-900 text-slate-200 select-none">
+
+<!-- ============================================================= -->
+<!-- TOP BAR: brand, mode switch, file actions                     -->
+<!-- ============================================================= -->
+<header class="h-12 flex items-center gap-4 px-4 bg-ink-800 border-b border-line">
+  <div class="flex items-center gap-2">
+    <div class="w-6 h-6 rounded bg-accent grid place-items-center text-xs font-bold">N</div>
+    <span class="font-semibold tracking-tight">NetSurvey</span>
+    <span class="text-[11px] text-slate-500 hidden sm:inline">Blueprint &amp; Drop Estimator</span>
+  </div>
+
+  <!-- Mode switch (Drafting / Topology) -->
+  <div class="ml-2 flex rounded-lg overflow-hidden border border-line text-sm">
+    <button id="modeDraft"    class="px-3 py-1.5 transition seg-active">✏️ Drafting</button>
+    <button id="modeTopology" class="px-3 py-1.5 transition hover:bg-ink-600">📡 Topology</button>
+  </div>
+
+  <div class="ml-auto flex items-center gap-2 text-sm">
+    <button id="btnUndo"   class="px-2.5 py-1.5 rounded bg-ink-700 hover:bg-ink-600 transition disabled:opacity-40 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+    <span class="w-px h-5 bg-line mx-1"></span>
+    <button id="btnNew"    class="px-2.5 py-1.5 rounded bg-ink-700 hover:bg-ink-600 transition" title="Clear everything and start over">New</button>
+    <button id="btnOpen"   class="px-2.5 py-1.5 rounded bg-ink-700 hover:bg-ink-600 transition" title="Open a saved project (.json)">Open</button>
+    <button id="btnSave"   class="px-2.5 py-1.5 rounded bg-ink-700 hover:bg-ink-600 transition" title="Save project to a .json file">Save</button>
+    <button id="btnExport" class="px-2.5 py-1.5 rounded bg-accent hover:bg-accent-soft transition" title="Export the canvas as a PNG image">Export PNG</button>
+    <button id="btnExportBW" class="px-2.5 py-1.5 rounded bg-ink-700 hover:bg-ink-600 transition" title="Export a black &amp; white blueprint — walls, devices &amp; a scale bar, no grid">Export B&amp;W</button>
+    <span class="w-px h-5 bg-line mx-1"></span>
+    <button id="btnFit"   class="px-2.5 py-1.5 rounded bg-ink-700 hover:bg-ink-600 transition" title="Zoom to fit">Fit</button>
+    <button id="btnReset" class="px-2.5 py-1.5 rounded bg-ink-700 hover:bg-ink-600 transition" title="Reset view">Reset view</button>
+  </div>
+  <input id="fileInput" type="file" accept="application/json,.json" class="hidden" />
+</header>
+
+<!-- ============================================================= -->
+<!-- MAIN: left tools/assets · center canvas · right properties    -->
+<!-- ============================================================= -->
+<div class="flex" style="height: calc(100vh - 3rem - 1.75rem);">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="w-56 shrink-0 bg-ink-800 border-r border-line flex flex-col scroll overflow-y-auto">
+    <!-- Drafting tools (Phase 2 fills these in) -->
+    <section id="panelDraft" class="p-3">
+      <h3 class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Drafting tools</h3>
+      <div id="draftTools" class="grid grid-cols-2 gap-2 text-xs">
+        <button data-tool="select"  class="toolbtn px-2 py-3 rounded bg-ink-700 hover:bg-ink-600 transition flex flex-col items-center gap-1"><span class="text-lg">🖱️</span> Select</button>
+        <button data-tool="wall"     class="toolbtn px-2 py-3 rounded bg-ink-700 hover:bg-ink-600 transition flex flex-col items-center gap-1"><span class="text-lg">📏</span> Wall</button>
+        <button data-tool="measure"  class="toolbtn px-2 py-3 rounded bg-ink-700 hover:bg-ink-600 transition flex flex-col items-center gap-1"><span class="text-lg">📐</span> Measure</button>
+        <button data-tool="scale"    class="toolbtn px-2 py-3 rounded bg-ink-700 hover:bg-ink-600 transition flex flex-col items-center gap-1"><span class="text-lg">🎯</span> Set Scale</button>
+      </div>
+
+      <label class="flex items-center justify-between mt-3 text-xs">
+        <span class="text-slate-400">Snap</span>
+        <select id="snapSel" class="bg-ink-700 border border-line rounded px-2 py-1">
+          <option value="off">Off</option>
+          <option value="grid" selected>Grid</option>
+          <option value="1ft">1 ft</option>
+          <option value="5ft">5 ft</option>
+        </select>
+      </label>
+
+      <p id="toolHint" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
+    </section>
+
+    <!-- Topology assets (Phase 3 fills these in) -->
+    <section id="panelTopology" class="p-3 hidden">
+      <h3 class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Mode</h3>
+      <div id="topoTools" class="grid grid-cols-3 gap-2 text-xs mb-4">
+        <button data-ttool="select" class="ttoolbtn px-2 py-3 rounded bg-ink-700 hover:bg-ink-600 transition flex flex-col items-center gap-1"><span class="text-lg">🖱️</span> Select</button>
+        <button data-ttool="cable"  class="ttoolbtn px-2 py-3 rounded bg-ink-700 hover:bg-ink-600 transition flex flex-col items-center gap-1"><span class="text-lg">🔗</span> Cable</button>
+        <button data-ttool="path"   class="ttoolbtn px-2 py-3 rounded bg-ink-700 hover:bg-ink-600 transition flex flex-col items-center gap-1"><span class="text-lg">📍</span> Path</button>
+      </div>
+
+      <h3 class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Asset palette</h3>
+      <div id="assetPalette" class="space-y-1.5 text-sm">
+        <button data-asset="drop"   class="assetbtn w-full px-2 py-2 rounded bg-ink-700 hover:bg-ink-600 transition flex items-center gap-2">🔌 Network Drop</button>
+        <button data-asset="ap"     class="assetbtn w-full px-2 py-2 rounded bg-ink-700 hover:bg-ink-600 transition flex items-center gap-2">📶 Access Point</button>
+        <button data-asset="switch" class="assetbtn w-full px-2 py-2 rounded bg-ink-700 hover:bg-ink-600 transition flex items-center gap-2">🔀 Switch</button>
+        <button data-asset="camera" class="assetbtn w-full px-2 py-2 rounded bg-ink-700 hover:bg-ink-600 transition flex items-center gap-2">📷 Camera</button>
+        <button data-asset="rack"   class="assetbtn w-full px-2 py-2 rounded bg-ink-700 hover:bg-ink-600 transition flex items-center gap-2">🗄️ Server Rack</button>
+      </div>
+
+      <p id="topoHint" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
+    </section>
+
+    <div class="mt-auto p-3 border-t border-line text-[11px] text-slate-500 leading-relaxed">
+      <div class="font-medium text-slate-400 mb-1">Navigation</div>
+      Scroll = zoom · Drag = pan<br />Middle-drag or Space+drag also pans<br />Pinch / one-finger drag on touch
+    </div>
+  </aside>
+
+  <!-- CENTER VIEWPORT -->
+  <main class="relative flex-1 bg-ink-900 overflow-hidden">
+    <svg id="viewport" class="w-full h-full block">
+      <defs>
+        <!-- Grid pattern lives in WORLD units; non-scaling-stroke keeps lines 1px at any zoom -->
+        <pattern id="gridMinor" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0 H0 V20" fill="none" stroke="#1b2436" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        </pattern>
+        <pattern id="gridMajor" width="100" height="100" patternUnits="userSpaceOnUse">
+          <rect width="100" height="100" fill="url(#gridMinor)"/>
+          <path d="M100 0 H0 V100" fill="none" stroke="#243149" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        </pattern>
+      </defs>
+
+      <!-- WORLD GROUP: everything inside is in world coordinates; pan/zoom transforms this -->
+      <g id="world">
+        <!-- effectively-infinite grid backdrop -->
+        <rect id="grid" x="-100000" y="-100000" width="200000" height="200000" fill="url(#gridMajor)"/>
+
+        <!-- LAYER STACK — render order matters, names map to state -->
+        <g id="layer-architecture"></g>  <!-- walls, dimension lines  (Phase 2) -->
+        <g id="layer-network"></g>       <!-- nodes, cables           (Phase 3) -->
+        <g id="layer-overlay"></g>       <!-- live cursor/draft preview -->
+
+        <!-- world origin marker so the empty canvas isn't disorienting -->
+        <g id="origin" opacity="0.5">
+          <line x1="-12" y1="0" x2="12" y2="0" stroke="#3b82f6" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="#3b82f6" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+        </g>
+      </g>
+    </svg>
+
+    <!-- floating zoom controls -->
+    <div class="absolute bottom-3 right-3 flex flex-col rounded-lg overflow-hidden border border-line bg-ink-800/90 backdrop-blur">
+      <button id="zoomIn"  class="w-9 h-9 hover:bg-ink-600 transition text-lg leading-none">+</button>
+      <button id="zoomOut" class="w-9 h-9 hover:bg-ink-600 transition text-lg leading-none border-t border-line">−</button>
+    </div>
+
+    <!-- SCALE-SETTER MODAL -->
+    <div id="scaleModal" class="hidden absolute inset-0 z-20 grid place-items-center bg-black/50">
+      <div class="bg-ink-800 border border-line rounded-xl p-5 w-80 space-y-3 shadow-2xl">
+        <h3 class="font-semibold">Set scale</h3>
+        <p class="text-sm text-slate-400">The line you drew represents this real-world distance:</p>
+        <div class="flex gap-2">
+          <input id="scaleVal" type="number" step="any" min="0" value="10"
+                 class="flex-1 bg-ink-700 border border-line rounded px-2 py-1.5 text-sm" />
+          <select id="scaleUnit" class="bg-ink-700 border border-line rounded px-2 py-1.5 text-sm">
+            <option value="ft">ft</option>
+            <option value="m">m</option>
+          </select>
+        </div>
+        <div id="scalePxInfo" class="text-[11px] text-slate-500"></div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button id="scaleCancel" class="px-3 py-1.5 rounded bg-ink-700 hover:bg-ink-600 text-sm">Cancel</button>
+          <button id="scaleSet" class="px-3 py-1.5 rounded bg-accent hover:bg-accent-soft text-sm">Set scale</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT PROPERTIES PANEL -->
+  <aside class="w-64 shrink-0 bg-ink-800 border-l border-line scroll overflow-y-auto">
+    <div class="p-3">
+      <h3 class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Properties</h3>
+      <div id="propsEmpty" class="text-sm text-slate-500 py-8 text-center">
+        Nothing selected.<br /><span class="text-[11px]">Select an item to edit it.</span>
+      </div>
+      <div id="propsBody" class="hidden space-y-3 text-sm"><!-- populated on selection (Phase 2/3) --></div>
+    </div>
+
+    <!-- Project / scale summary -->
+    <div class="p-3 border-t border-line text-sm space-y-1.5">
+      <h3 class="text-[11px] uppercase tracking-wider text-slate-500 mb-1">Project</h3>
+      <div class="flex justify-between"><span class="text-slate-400">Mode</span><span id="sumMode">Drafting</span></div>
+      <div class="flex justify-between"><span class="text-slate-400">Scale</span><span id="sumScale" class="text-amber-400">not set</span></div>
+      <div class="flex justify-between"><span class="text-slate-400">Walls</span><span id="sumWalls">0</span></div>
+      <div class="flex justify-between"><span class="text-slate-400">Assets</span><span id="sumAssets">0</span></div>
+    </div>
+  </aside>
+</div>
+
+<!-- STATUS BAR -->
+<footer class="h-7 flex items-center gap-4 px-4 bg-ink-800 border-t border-line text-[11px] text-slate-400">
+  <span id="statMode" class="text-accent font-medium">Drafting mode</span>
+  <span id="statZoom">100%</span>
+  <span id="statCursor">x: 0.0  y: 0.0 (px)</span>
+  <span class="ml-auto text-slate-600">Phase 1 · architecture + canvas</span>
+</footer>
+
+<script>
+/* ===================================================================
+   APPLICATION STATE
+   The whole project is one serialisable object. Phases 2–4 read/write
+   these arrays; the JSON save/load in Phase 4 simply dumps `state`.
+   =================================================================== */
+const state = {
+  mode: 'draft',                 // 'draft' | 'topology'
+  activeTool: 'select',          // draft: 'select' | 'wall' | 'measure' | 'scale'
+  topo: { tool: 'select', pendingAsset: null, cableFrom: null, cablePath: [] }, // topology mode
+  snap: { mode: 'grid' },        // 'off' | 'grid' | '1ft' | '5ft'
+
+  // transient in-progress drawing (never serialised)
+  draft: { wallPoints: [], measure: null, scale: null },
+
+  // viewport transform: world->screen is  screen = world*scale + (tx,ty)
+  view: { scale: 1, tx: 0, ty: 0 },
+
+  // calibration set in Phase 2 (pixels per real-world unit)
+  scale: { pxPerUnit: null, unit: 'ft' },
+
+  // ARCHITECTURAL LAYERS (Phase 2) — kept separate from network on purpose
+  architecture: {
+    walls: [],        // { id, points:[{x,y},…], closed:bool }
+    dimensions: [],   // { id, a:{x,y}, b:{x,y} }
+  },
+
+  // NETWORK INFRASTRUCTURE LAYERS (Phase 3)
+  network: {
+    nodes: [],        // { id, type:'drop|ap|switch|camera|rack', x, y, name, mac, ip, notes }
+    cables: [],       // { id, fromId, toId, lengthUnits }
+  },
+
+  selectionId: null,
+  _seq: 1,
+};
+const uid = () => state._seq++;
+
+/* ===================================================================
+   SVG / VIEW PLUMBING
+   =================================================================== */
+const svg    = document.getElementById('viewport');
+const world  = document.getElementById('world');
+
+// keep the world transform in sync with state.view
+function applyView() {
+  const { scale, tx, ty } = state.view;
+  world.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
+  document.getElementById('statZoom').textContent = Math.round(scale * 100) + '%';
+}
+
+// screen (client px) -> world coordinates
+function toWorld(clientX, clientY) {
+  const r = svg.getBoundingClientRect();
+  const sx = clientX - r.left, sy = clientY - r.top;
+  return { x: (sx - state.view.tx) / state.view.scale,
+           y: (sy - state.view.ty) / state.view.scale };
+}
+
+// zoom toward a screen anchor point so the world point under the cursor stays put
+function zoomAt(clientX, clientY, factor) {
+  const r = svg.getBoundingClientRect();
+  const sx = clientX - r.left, sy = clientY - r.top;
+  const w = toWorld(clientX, clientY);
+  const next = Math.min(40, Math.max(0.05, state.view.scale * factor));
+  state.view.scale = next;
+  // solve tx,ty so that world point w maps back to screen (sx,sy)
+  state.view.tx = sx - w.x * next;
+  state.view.ty = sy - w.y * next;
+  applyView();
+}
+
+/* ----- wheel zoom ----- */
+svg.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+  zoomAt(e.clientX, e.clientY, factor);
+}, { passive: false });
+
+/* ----- pointer-based pan + multi-touch pinch -----
+   In Phase 1 every pointer pans. Phase 2/3 will gate this behind the
+   active tool (so the Wall tool draws instead of panning), but pan via
+   middle button / space-drag / two-finger will always remain available. */
+const pointers = new Map();         // pointerId -> {x,y}
+let panning = false, panLast = null;
+let pinchPrev = null;               // {dist, cx, cy}
+let spaceHeld = false;
+let didPan = false;                 // true if the gesture moved — suppresses the trailing click
+let mouseWorld = { x: 0, y: 0 };    // latest snapped cursor position, for live previews
+let draggingNode = null;            // topology: id of the node being dragged
+let dragMoved = false;              // distinguishes a node drag from a node click
+let downX = 0, downY = 0;           // pointerdown position, to measure drag distance
+let pendingCandidate = null;        // 'pan' | 'nodedrag' — armed on down, activated once the pointer moves
+let pendingNodeId = null;
+
+// A left-drag pans only with the Select tool; drawing tools place points instead.
+// Middle-button, Space-drag and two-finger always pan regardless of tool.
+function isPanIntent(e) {
+  if (e.button === 1 || spaceHeld) return true;
+  if (state.mode === 'draft')    return state.activeTool === 'select';
+  return state.topo.tool === 'select';   // topology: select pans empty space; place/cable use clicks
+}
+
+svg.addEventListener('pointerdown', (e) => {
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (pointers.size === 2) {                     // begin pinch
+    const [a, b] = [...pointers.values()];
+    pinchPrev = pinchState(a, b);
+    panning = false; pendingCandidate = null;
+    return;
+  }
+  // Decide intent but DON'T capture the pointer yet — capturing here retargets the
+  // resulting click event to the <svg>, which would break node/cable/selection clicks.
+  didPan = false; dragMoved = false;
+  downX = e.clientX; downY = e.clientY;
+  pendingCandidate = null; pendingNodeId = null;
+
+  // topology + select: grabbing a node drags it instead of panning
+  if (state.mode === 'topology' && state.topo.tool === 'select' && e.button === 0 && !spaceHeld) {
+    const g = e.target.closest && e.target.closest('[data-node-id]');
+    if (g) { pendingCandidate = 'nodedrag'; pendingNodeId = +g.dataset.nodeId; return; }
+  }
+  if (isPanIntent(e)) pendingCandidate = 'pan';
+});
+
+svg.addEventListener('pointermove', (e) => {
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  // live cursor readout (world units, or calibrated units once scale is set)
+  const w = toWorld(e.clientX, e.clientY);
+  mouseWorld = snapWorld(w);
+  const stat = document.getElementById('statCursor');
+  if (state.scale.pxPerUnit) {
+    stat.textContent = `x: ${(mouseWorld.x/state.scale.pxPerUnit).toFixed(1)}  y: ${(mouseWorld.y/state.scale.pxPerUnit).toFixed(1)} (${state.scale.unit})`;
+  } else {
+    stat.textContent = `x: ${mouseWorld.x.toFixed(1)}  y: ${mouseWorld.y.toFixed(1)} (px)`;
+  }
+
+  // promote an armed gesture to an active drag/pan once the pointer actually moves (~3px)
+  if (pendingCandidate && draggingNode == null && !panning && pointers.size < 2) {
+    if (Math.hypot(e.clientX - downX, e.clientY - downY) > 3) {
+      svg.setPointerCapture(e.pointerId);
+      if (pendingCandidate === 'pan') { panning = true; panLast = { x: downX, y: downY }; svg.classList.add('panning'); }
+      else if (pendingCandidate === 'nodedrag') { pushUndo(); draggingNode = pendingNodeId; dragMoved = false; }
+      pendingCandidate = null;
+    }
+  }
+
+  if (draggingNode != null) {                    // move a topology node
+    const n = nodeById(draggingNode);
+    if (n) { n.x = mouseWorld.x; n.y = mouseWorld.y; dragMoved = true; updateCablesFor(draggingNode); renderNetwork(); }
+    return;
+  }
+
+  if (pointers.size === 2 && pinchPrev) {        // pinch zoom + pan
+    const [a, b] = [...pointers.values()];
+    const now = pinchState(a, b);
+    zoomAt(now.cx, now.cy, now.dist / pinchPrev.dist);
+    // pan by the movement of the pinch centroid
+    state.view.tx += now.cx - pinchPrev.cx;
+    state.view.ty += now.cy - pinchPrev.cy;
+    applyView();
+    pinchPrev = now;
+    didPan = true;
+    return;
+  }
+
+  if (panning && panLast) {
+    state.view.tx += e.clientX - panLast.x;
+    state.view.ty += e.clientY - panLast.y;
+    panLast = { x: e.clientX, y: e.clientY };
+    applyView();
+    didPan = true;
+  }
+
+  // redraw live previews (draft rubber-band, or topology ghost/cable)
+  if (state.mode === 'topology') renderTopoOverlay();
+  else if (isDrawing()) renderOverlay();
+});
+
+function endPointer(e) {
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinchPrev = null;
+  if (draggingNode != null && pointers.size === 0) {
+    if (dragMoved) didPan = true;     // swallow the trailing click so the node isn't deselected
+    draggingNode = null;
+  }
+  if (pointers.size === 0) { panning = false; svg.classList.remove('panning'); pendingCandidate = null; }
+}
+svg.addEventListener('pointerup', endPointer);
+svg.addEventListener('pointercancel', endPointer);
+svg.addEventListener('pointerleave', endPointer);
+
+function pinchState(a, b) {
+  const dx = a.x - b.x, dy = a.y - b.y;
+  return { dist: Math.hypot(dx, dy) || 1, cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 };
+}
+
+/* space-to-pan affordance */
+addEventListener('keydown', (e) => { if (e.code === 'Space') spaceHeld = true; });
+addEventListener('keyup',   (e) => { if (e.code === 'Space') spaceHeld = false; });
+
+/* ----- zoom buttons (zoom about viewport centre) ----- */
+function centerZoom(factor) {
+  const r = svg.getBoundingClientRect();
+  zoomAt(r.left + r.width / 2, r.top + r.height / 2, factor);
+}
+document.getElementById('zoomIn').onclick  = () => centerZoom(1.2);
+document.getElementById('zoomOut').onclick = () => centerZoom(1 / 1.2);
+
+/* ----- reset + fit ----- */
+function resetView() {
+  const r = svg.getBoundingClientRect();
+  state.view = { scale: 1, tx: r.width / 2, ty: r.height / 2 };
+  applyView();
+}
+document.getElementById('btnReset').onclick = resetView;
+
+// Fit: frame all current geometry (origin only in Phase 1 -> behaves like reset)
+function fitView() {
+  const pts = [];
+  state.architecture.walls.forEach(w => pts.push(...w.points));
+  state.network.nodes.forEach(n => pts.push({ x: n.x, y: n.y }));
+  if (pts.length === 0) return resetView();
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const r = svg.getBoundingClientRect(), pad = 60;
+  const sx = (r.width  - pad*2) / Math.max(1, maxX - minX);
+  const sy = (r.height - pad*2) / Math.max(1, maxY - minY);
+  const scale = Math.min(40, Math.max(0.05, Math.min(sx, sy)));
+  state.view = {
+    scale,
+    tx: pad - minX*scale + (r.width  - pad*2 - (maxX-minX)*scale)/2,
+    ty: pad - minY*scale + (r.height - pad*2 - (maxY-minY)*scale)/2,
+  };
+  applyView();
+}
+document.getElementById('btnFit').onclick = fitView;
+
+/* ===================================================================
+   MODE SWITCHING (Drafting <-> Topology)
+   =================================================================== */
+const archLayer = document.getElementById('layer-architecture');
+const netLayer  = document.getElementById('layer-network');
+
+function setMode(mode) {
+  state.mode = mode;
+  const draft = mode === 'draft';
+
+  // segmented control styling
+  document.getElementById('modeDraft').classList.toggle('seg-active', draft);
+  document.getElementById('modeTopology').classList.toggle('seg-active', !draft);
+
+  // swap the left sidebar panels
+  document.getElementById('panelDraft').classList.toggle('hidden', !draft);
+  document.getElementById('panelTopology').classList.toggle('hidden', draft);
+
+  // In Drafting: architecture is fully active, network dimmed/locked.
+  // In Topology: blueprint becomes a faint locked backdrop, network active.
+  archLayer.style.opacity       = draft ? '1'    : '0.35';
+  archLayer.style.pointerEvents = draft ? 'auto' : 'none';
+  netLayer.style.opacity        = draft ? '0.5'  : '1';
+  netLayer.style.pointerEvents  = draft ? 'none' : 'auto';
+
+  document.getElementById('statMode').textContent = draft ? 'Drafting mode' : 'Topology mode';
+  document.getElementById('sumMode').textContent  = draft ? 'Drafting' : 'Topology';
+
+  // lock in any wall in progress, then clear transients and set the cursor
+  commitWall();
+  state.draft.wallPoints = []; state.draft.measure = null; state.draft.scale = null;
+  state.topo.cableFrom = null; state.topo.cablePath = [];
+  if (draft) svg.style.cursor = (state.activeTool !== 'select') ? 'crosshair' : 'grab';
+  else       svg.style.cursor = (state.topo.tool !== 'select') ? 'crosshair' : 'grab';
+  renderAll();
+}
+document.getElementById('modeDraft').onclick    = () => setMode('draft');
+document.getElementById('modeTopology').onclick = () => setMode('topology');
+
+/* ===================================================================
+   PHASE 2 — DRAFTING TOOLSET
+   =================================================================== */
+const overlayLayer = document.getElementById('layer-overlay');
+const SVGNS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+
+// world px length -> human string in calibrated units (or px before scale is set)
+function fmtLen(px) {
+  return state.scale.pxPerUnit
+    ? (px / state.scale.pxPerUnit).toFixed(1) + ' ' + state.scale.unit
+    : Math.round(px) + ' px';
+}
+
+/* ----- grid snapping ----- */
+function snapStep() {
+  switch (state.snap.mode) {
+    case 'grid': return 20;                                        // base grid units
+    case '1ft':  return state.scale.pxPerUnit || 20;              // fall back to grid pre-calibration
+    case '5ft':  return state.scale.pxPerUnit ? state.scale.pxPerUnit * 5 : 100;
+    default:     return 0;                                        // 'off'
+  }
+}
+function snapWorld(p) {
+  const s = snapStep();
+  return s ? { x: Math.round(p.x / s) * s, y: Math.round(p.y / s) * s } : { x: p.x, y: p.y };
+}
+
+function isDrawing() {
+  if (state.mode !== 'draft') return false;
+  return (state.activeTool === 'wall'    && state.draft.wallPoints.length > 0)
+      || (state.activeTool === 'measure' && state.draft.measure)
+      || (state.activeTool === 'scale'   && state.draft.scale);
+}
+
+/* ----- click to place points; double-click / Enter to finish a wall ----- */
+svg.addEventListener('click', (e) => {
+  if (didPan || e.button !== 0 || spaceHeld) return;
+  const p = snapWorld(toWorld(e.clientX, e.clientY));
+
+  if (state.mode === 'draft') {
+    if (state.activeTool === 'wall') {
+      const pts = state.draft.wallPoints;
+      const thr = 12 / state.view.scale;     // ~12 screen px, in world units (tighter as you zoom in)
+      if (pts.length >= 3 && dist(p, pts[0]) <= thr) { finishWall(true); return; }              // click first point -> close loop
+      if (pts.length >= 2 && dist(p, pts[pts.length - 1]) <= thr) { finishWall(false); return; } // click last point -> finish
+      pts.push(p);
+      renderOverlay();
+    } else if (state.activeTool === 'measure') {
+      if (!state.draft.measure) state.draft.measure = { a: p };
+      else { pushUndo(); state.architecture.dimensions.push({ id: uid(), a: state.draft.measure.a, b: p }); state.draft.measure = null; renderAll(); }
+      renderOverlay();
+    } else if (state.activeTool === 'scale') {
+      if (!state.draft.scale) state.draft.scale = { a: p, b: null };
+      else { state.draft.scale.b = p; openScaleModal(); }
+      renderOverlay();
+    } else {                                 // select: empty-space click clears selection
+      clearSelection();
+    }
+  } else {                                   // ---- TOPOLOGY ----
+    if (state.topo.tool === 'place' && state.topo.pendingAsset) {
+      addNode(state.topo.pendingAsset, p);   // stays armed so multiple drops are easy
+    } else if (state.topo.tool === 'cable') {
+      handleCableClick(e);
+    } else if (state.topo.tool === 'path') {
+      handlePathClick(p, e);
+    } else {                                 // select
+      clearSelection();
+    }
+  }
+});
+svg.addEventListener('dblclick', () => {
+  if (state.mode === 'draft' && state.activeTool === 'wall') finishWall();
+});
+
+function dedupe(pts) {                 // collapse the duplicate vertices a double-click leaves behind
+  const out = [];
+  for (const p of pts) {
+    const last = out[out.length - 1];
+    if (!last || Math.hypot(last.x - p.x, last.y - p.y) > 0.5) out.push(p);
+  }
+  return out;
+}
+// commit the in-progress wall (>=2 vertices) without re-rendering — callers render
+function commitWall(closed = false) {
+  const pts = dedupe(state.draft.wallPoints);
+  if (pts.length >= 2) { pushUndo(); state.architecture.walls.push({ id: uid(), points: pts, closed }); }
+  state.draft.wallPoints = [];
+}
+function finishWall(closed = false) { commitWall(closed); renderAll(); }
+function cancelDraft() { state.draft.wallPoints = []; state.draft.measure = null; state.draft.scale = null; closeScaleModal(); renderAll(); }
+
+/* ----- selection + deletion ----- */
+function selectId(id) { state.selectionId = id; renderAll(); }
+function clearSelection() { if (state.selectionId != null) { state.selectionId = null; renderAll(); } }
+function deleteSelected() {
+  pushUndo();
+  const id = state.selectionId;
+  state.architecture.walls      = state.architecture.walls.filter(w => w.id !== id);
+  state.architecture.dimensions = state.architecture.dimensions.filter(d => d.id !== id);
+  state.network.nodes  = state.network.nodes.filter(n => n.id !== id);
+  // deleting a node also removes any cable attached to it; deleting a cable removes just itself
+  state.network.cables = state.network.cables.filter(c => c.id !== id && c.fromId !== id && c.toId !== id);
+  state.selectionId = null;
+  renderAll();
+}
+
+/* ----- keyboard: Esc cancel · Enter finish wall · Del remove selection ----- */
+addEventListener('keydown', (e) => {
+  if (e.target.matches && e.target.matches('input,select,textarea')) return;
+  if ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ') { e.preventDefault(); undo(); return; }
+  if (e.code === 'Escape') {
+    if (state.mode === 'topology') {
+      if (state.topo.cableFrom != null) { state.topo.cableFrom = null; state.topo.cablePath = []; renderNetwork(); renderTopoOverlay(); }
+      else setTopoTool('select');
+    } else cancelDraft();
+  }
+  else if (e.code === 'Enter' && state.mode === 'draft' && state.activeTool === 'wall') finishWall();
+  else if (e.code === 'Delete' || e.code === 'Backspace') {
+    // while routing a path, Backspace pops the last pivot rather than deleting a selection
+    if (state.mode === 'topology' && state.topo.tool === 'path' && state.topo.cableFrom != null && state.topo.cablePath.length) {
+      e.preventDefault(); state.topo.cablePath.pop(); renderTopoOverlay();
+    } else if (state.selectionId != null) { e.preventDefault(); deleteSelected(); }
+  }
+});
+
+/* ===================================================================
+   RENDERING — rebuild SVG layers from state
+   =================================================================== */
+// constant-screen-size text with a dark halo for legibility on the grid
+function labelEl(x, y, txt, color) {
+  const t = el('text', { x, y: y - 6, fill: color, 'font-size': '12',
+    'font-family': 'ui-sans-serif,system-ui', 'text-anchor': 'middle',
+    'paint-order': 'stroke', stroke: '#0b0f17', 'stroke-width': '3', 'stroke-linejoin': 'round' });
+  t.textContent = txt;
+  return t;
+}
+
+function dimGroup(d) {
+  const sel = d.id === state.selectionId;
+  const col = sel ? '#fbbf24' : '#f59e0b';
+  const g = el('g', {});
+  g.appendChild(el('line', { x1: d.a.x, y1: d.a.y, x2: d.b.x, y2: d.b.y, stroke: col,
+    'stroke-width': '1.5', 'stroke-dasharray': '6 4', 'vector-effect': 'non-scaling-stroke' }));
+  [d.a, d.b].forEach(p => g.appendChild(el('circle', { cx: p.x, cy: p.y, r: '2.5', fill: col, 'vector-effect': 'non-scaling-stroke' })));
+  g.appendChild(labelEl((d.a.x + d.b.x) / 2, (d.a.y + d.b.y) / 2, fmtLen(dist(d.a, d.b)), col));
+  g.style.cursor = 'pointer';
+  g.addEventListener('click', (ev) => { if (state.activeTool === 'select' && !didPan) { ev.stopPropagation(); selectId(d.id); } });
+  return g;
+}
+
+function renderWalls() {
+  archLayer.innerHTML = '';
+  state.architecture.dimensions.forEach(d => archLayer.appendChild(dimGroup(d)));
+  for (const w of state.architecture.walls) {
+    const sel = w.id === state.selectionId;
+    const pts = w.closed ? [...w.points, w.points[0]] : w.points;   // close the loop visually
+    const poly = el('polyline', { points: pts.map(p => `${p.x},${p.y}`).join(' '),
+      fill: 'none', stroke: sel ? '#60a5fa' : '#cbd5e1', 'stroke-width': '2',
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'vector-effect': 'non-scaling-stroke' });
+    poly.style.cursor = 'pointer';
+    poly.addEventListener('click', (ev) => { if (state.activeTool === 'select' && !didPan) { ev.stopPropagation(); selectId(w.id); } });
+    archLayer.appendChild(poly);
+    w.points.forEach(p => archLayer.appendChild(el('circle', { cx: p.x, cy: p.y, r: '3',
+      fill: sel ? '#60a5fa' : '#64748b', 'vector-effect': 'non-scaling-stroke' })));
+  }
+}
+
+function renderOverlay() {
+  overlayLayer.innerHTML = '';
+  if (state.mode === 'draft' && state.activeTool !== 'select') {
+    overlayLayer.appendChild(el('circle', { cx: mouseWorld.x, cy: mouseWorld.y, r: '3',
+      fill: 'none', stroke: '#3b82f6', 'stroke-width': '1.5', 'vector-effect': 'non-scaling-stroke' }));
+  }
+  if (state.activeTool === 'wall' && state.draft.wallPoints.length) {
+    const pts = [...state.draft.wallPoints, mouseWorld];
+    overlayLayer.appendChild(el('polyline', { points: pts.map(p => `${p.x},${p.y}`).join(' '),
+      fill: 'none', stroke: '#3b82f6', 'stroke-width': '2', 'stroke-dasharray': '4 3', 'vector-effect': 'non-scaling-stroke' }));
+    state.draft.wallPoints.forEach(p => overlayLayer.appendChild(el('circle', { cx: p.x, cy: p.y, r: '3', fill: '#3b82f6', 'vector-effect': 'non-scaling-stroke' })));
+    const last = state.draft.wallPoints[state.draft.wallPoints.length - 1];
+    overlayLayer.appendChild(labelEl((last.x + mouseWorld.x) / 2, (last.y + mouseWorld.y) / 2, fmtLen(dist(last, mouseWorld)), '#93c5fd'));
+  }
+  if (state.activeTool === 'measure' && state.draft.measure) {
+    const a = state.draft.measure.a, b = mouseWorld;
+    overlayLayer.appendChild(el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: '#f59e0b',
+      'stroke-width': '1.5', 'stroke-dasharray': '6 4', 'vector-effect': 'non-scaling-stroke' }));
+    overlayLayer.appendChild(labelEl((a.x + b.x) / 2, (a.y + b.y) / 2, fmtLen(dist(a, b)), '#fbbf24'));
+  }
+  if (state.activeTool === 'scale' && state.draft.scale) {
+    const a = state.draft.scale.a, b = state.draft.scale.b || mouseWorld;
+    overlayLayer.appendChild(el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: '#34d399', 'stroke-width': '2', 'vector-effect': 'non-scaling-stroke' }));
+    overlayLayer.appendChild(labelEl((a.x + b.x) / 2, (a.y + b.y) / 2, Math.round(dist(a, b)) + ' px', '#6ee7b7'));
+  }
+}
+
+function renderProps() {
+  const empty = document.getElementById('propsEmpty'), body = document.getElementById('propsBody');
+  const id = state.selectionId;
+  const wall  = state.architecture.walls.find(w => w.id === id);
+  const dim   = !wall  && state.architecture.dimensions.find(d => d.id === id);
+  const node  = !dim   && state.network.nodes.find(n => n.id === id);
+  const cable = !node  && state.network.cables.find(c => c.id === id);
+
+  if (!wall && !dim && !node && !cable) { empty.classList.remove('hidden'); body.classList.add('hidden'); body.innerHTML = ''; return; }
+  empty.classList.add('hidden'); body.classList.remove('hidden');
+
+  if (wall) {
+    let len = 0; for (let i = 1; i < wall.points.length; i++) len += dist(wall.points[i - 1], wall.points[i]);
+    body.innerHTML =
+      `<div class="flex justify-between"><span class="text-slate-400">Type</span><span>Wall</span></div>
+       <div class="flex justify-between"><span class="text-slate-400">Vertices</span><span>${wall.points.length}</span></div>
+       <div class="flex justify-between"><span class="text-slate-400">Length</span><span>${fmtLen(len)}</span></div>`;
+  } else if (dim) {
+    body.innerHTML =
+      `<div class="flex justify-between"><span class="text-slate-400">Type</span><span>Dimension</span></div>
+       <div class="flex justify-between"><span class="text-slate-400">Length</span><span>${fmtLen(dist(dim.a, dim.b))}</span></div>`;
+  } else if (node) {
+    const a = ASSETS[node.type];
+    const inp = 'w-full bg-ink-700 border border-line rounded px-2 py-1 text-sm mt-0.5';
+    const portsRow = node.type === 'drop' ? `
+       <label class="block"><span class="text-slate-400 text-xs">Faceplate ports</span>
+         <select data-ports class="${inp}">
+           <option value="1">Single (1)</option>
+           <option value="2">Duo (2)</option>
+           <option value="4">Quad (4)</option>
+           <option value="6">Six (6)</option>
+         </select></label>` : '';
+    body.innerHTML =
+      `<div class="flex justify-between"><span class="text-slate-400">Type</span><span>${a.icon} ${a.label}</span></div>
+       <label class="block"><span class="text-slate-400 text-xs">Name / ID</span><input data-f="name" class="${inp}"></label>
+       ${portsRow}
+       <label class="block"><span class="text-slate-400 text-xs">MAC</span><input data-f="mac" class="${inp}" placeholder="optional"></label>
+       <label class="block"><span class="text-slate-400 text-xs">IP</span><input data-f="ip" class="${inp}" placeholder="optional"></label>
+       <label class="block"><span class="text-slate-400 text-xs">Notes</span><textarea data-f="notes" rows="2" class="${inp}" placeholder="optional"></textarea></label>`;
+    body.querySelectorAll('[data-f]').forEach(field => {
+      const key = field.dataset.f;
+      field.value = node[key] || '';
+      field.onfocus = () => { editSnapped = false; };
+      field.oninput = () => { if (!editSnapped) { pushUndo(); editSnapped = true; } node[key] = field.value; if (key === 'name') renderNetwork(); };
+    });
+    const portsSel = body.querySelector('[data-ports]');
+    if (portsSel) { portsSel.value = String(node.ports || 1); portsSel.onchange = () => { pushUndo(); node.ports = +portsSel.value; renderNetwork(); }; }
+  } else if (cable) {
+    const a = nodeById(cable.fromId), b = nodeById(cable.toId);
+    const pts = runPoints(cable);
+    const pivots = (cable.path || []).length;
+    body.innerHTML =
+      `<div class="flex justify-between"><span class="text-slate-400">Type</span><span>${pivots ? '📍 Path' : '🔗 Cable'}</span></div>
+       <div class="flex justify-between"><span class="text-slate-400">From</span><span>${a ? a.name : '—'}</span></div>
+       <div class="flex justify-between"><span class="text-slate-400">To</span><span>${b ? b.name : '—'}</span></div>
+       <div class="flex justify-between"><span class="text-slate-400">Pivots</span><span>${pivots}</span></div>
+       <div class="flex justify-between"><span class="text-slate-400">Run length</span><span>${pts ? fmtLen(runPx(pts)) : '—'}</span></div>`;
+  }
+
+  const btn = document.createElement('button');
+  btn.className = 'w-full mt-1 px-3 py-1.5 rounded bg-red-600/80 hover:bg-red-600 text-sm transition';
+  btn.textContent = 'Delete';
+  btn.onclick = deleteSelected;
+  body.appendChild(btn);
+}
+
+function render() {     // project summary (right panel + status)
+  document.getElementById('sumWalls').textContent  = state.architecture.walls.length;
+  document.getElementById('sumAssets').textContent = state.network.nodes.length;
+  const s = document.getElementById('sumScale');
+  if (state.scale.pxPerUnit) {
+    s.textContent = `${state.scale.pxPerUnit.toFixed(1)} px/${state.scale.unit}`;
+    s.classList.remove('text-amber-400'); s.classList.add('text-emerald-400');
+  } else {
+    s.textContent = 'not set';
+    s.classList.add('text-amber-400'); s.classList.remove('text-emerald-400');
+  }
+}
+
+function renderActiveOverlay() { if (state.mode === 'topology') renderTopoOverlay(); else renderOverlay(); }
+function renderAll() { renderWalls(); renderNetwork(); renderActiveOverlay(); renderProps(); render(); }
+
+/* ===================================================================
+   SCALE-SETTER MODAL
+   =================================================================== */
+function openScaleModal() {
+  const seg = state.draft.scale; if (!seg || !seg.b) return;
+  document.getElementById('scalePxInfo').textContent = `Drawn line = ${Math.round(dist(seg.a, seg.b))} px`;
+  document.getElementById('scaleModal').classList.remove('hidden');
+  document.getElementById('scaleVal').focus();
+}
+function closeScaleModal() { document.getElementById('scaleModal').classList.add('hidden'); }
+document.getElementById('scaleSet').onclick = () => {
+  const seg = state.draft.scale;
+  const val = parseFloat(document.getElementById('scaleVal').value);
+  if (seg && seg.b && val > 0) {
+    pushUndo();
+    state.scale.pxPerUnit = dist(seg.a, seg.b) / val;
+    state.scale.unit = document.getElementById('scaleUnit').value;
+  }
+  state.draft.scale = null; closeScaleModal(); renderAll();
+};
+document.getElementById('scaleCancel').onclick = () => { state.draft.scale = null; closeScaleModal(); renderAll(); };
+
+/* ===================================================================
+   TOOL SELECTION
+   =================================================================== */
+const TOOL_HINTS = {
+  select:  'Click an item to select it. Drag to pan.',
+  wall:    'Click to place corners. Click the last point again (or double-click / Enter) to finish · click the first point to close · Esc cancels.',
+  measure: 'Click two points to drop a dimension line · Esc cancels.',
+  scale:   'Draw a line over a known distance, then type its real length.',
+};
+function setTool(t) {
+  commitWall();   // lock in any wall in progress before leaving the tool
+  state.activeTool = t;
+  state.draft.wallPoints = []; state.draft.measure = null; state.draft.scale = null;
+  document.querySelectorAll('#draftTools .toolbtn').forEach(b => b.classList.toggle('active', b.dataset.tool === t));
+  svg.style.cursor = (t === 'select') ? 'grab' : 'crosshair';
+  document.getElementById('toolHint').textContent = TOOL_HINTS[t] || '';
+  renderAll();
+}
+document.querySelectorAll('#draftTools .toolbtn').forEach(b => b.onclick = () => setTool(b.dataset.tool));
+document.getElementById('snapSel').onchange = (e) => { state.snap.mode = e.target.value; };
+
+/* ===================================================================
+   PHASE 3 — TOPOLOGY (assets, placement, cabling)
+   =================================================================== */
+const ASSETS = {
+  drop:   { icon: '🔌', color: '#38bdf8', label: 'Drop' },
+  ap:     { icon: '📶', color: '#34d399', label: 'AP' },
+  switch: { icon: '🔀', color: '#a78bfa', label: 'Switch' },
+  camera: { icon: '📷', color: '#f472b6', label: 'Camera' },
+  rack:   { icon: '🗄️', color: '#fbbf24', label: 'Rack' },
+};
+const nodeById = (id) => state.network.nodes.find(n => n.id === id);
+
+// total pixel length of a run: source -> pivot points -> destination
+function runPx(pts) { let t = 0; for (let i = 1; i < pts.length; i++) t += dist(pts[i - 1], pts[i]); return t; }
+function runPoints(c) { const a = nodeById(c.fromId), b = nodeById(c.toId); return (a && b) ? [a, ...(c.path || []), b] : null; }
+// point at the halfway arc-length of a polyline, for placing the length label
+function runMidpoint(pts) {
+  const total = runPx(pts); let half = total / 2, prev = pts[0];
+  for (let i = 1; i < pts.length; i++) {
+    const seg = dist(prev, pts[i]);
+    if (half <= seg) { const t = seg ? half / seg : 0; return { x: prev.x + (pts[i].x - prev.x) * t, y: prev.y + (pts[i].y - prev.y) * t }; }
+    half -= seg; prev = pts[i];
+  }
+  return pts[pts.length - 1];
+}
+
+function addNode(type, p) {
+  pushUndo();
+  const n = state.network.nodes.filter(x => x.type === type).length + 1;
+  const node = { id: uid(), type, x: p.x, y: p.y, name: `${ASSETS[type].label} ${n}`, ports: 1, mac: '', ip: '', notes: '' };
+  state.network.nodes.push(node);
+  renderNetwork(); render();
+  return node;
+}
+
+function cableLenUnits(c) {
+  const pts = runPoints(c);
+  return (pts && state.scale.pxPerUnit) ? runPx(pts) / state.scale.pxPerUnit : null;
+}
+function addCable(fromId, toId, path) {
+  const exists = state.network.cables.some(c =>
+    (c.fromId === fromId && c.toId === toId) || (c.fromId === toId && c.toId === fromId));
+  if (exists) return;
+  pushUndo();
+  const c = { id: uid(), fromId, toId, path: path || [] };
+  c.lengthUnits = cableLenUnits(c);
+  state.network.cables.push(c);
+  renderNetwork();
+}
+// keep stored cable lengths current after a node moves
+function updateCablesFor(nodeId) {
+  for (const c of state.network.cables)
+    if (c.fromId === nodeId || c.toId === nodeId) c.lengthUnits = cableLenUnits(c);
+}
+
+// straight Cable tool: click any device, then any other device. A switch can be either end.
+function handleCableClick(e) {
+  const g = e.target.closest && e.target.closest('[data-node-id]');
+  const id = g ? +g.dataset.nodeId : null;
+  if (id == null) { state.topo.cableFrom = null; renderNetwork(); renderTopoOverlay(); return; }  // clicked empty -> cancel
+  if (state.topo.cableFrom == null) state.topo.cableFrom = id;
+  else if (id !== state.topo.cableFrom) { addCable(state.topo.cableFrom, id); state.topo.cableFrom = null; }
+  renderNetwork(); renderTopoOverlay();
+}
+
+// Path tool: click a device, drop pivot points on empty space to route the run, click the end device.
+function handlePathClick(p, e) {
+  const g = e.target.closest && e.target.closest('[data-node-id]');
+  const id = g ? +g.dataset.nodeId : null;
+  if (state.topo.cableFrom == null) {
+    if (id != null) { state.topo.cableFrom = id; state.topo.cablePath = []; }   // must start on a device
+  } else if (id == null) {
+    state.topo.cablePath.push(p);                                               // pivot point
+  } else if (id !== state.topo.cableFrom) {
+    addCable(state.topo.cableFrom, id, state.topo.cablePath.slice());           // finish on a device
+    state.topo.cableFrom = null; state.topo.cablePath = [];
+  }
+  renderNetwork(); renderTopoOverlay();
+}
+
+/* ----- topology rendering ----- */
+// grid arrangement of keystone ports on a faceplate, by port count
+const PORT_GRID = { 1: [1, 1], 2: [2, 1], 4: [2, 2], 6: [3, 2] };
+// A drop renders as a faceplate showing its keystone ports; everything else is an icon disc.
+function glyphFor(type, x, y, ports = 1, opacity = 1) {
+  const a = ASSETS[type];
+  const g = el('g', { opacity });
+  if (type === 'drop') {
+    const [cols, rows] = PORT_GRID[ports] || [ports, 1];
+    const ps = 5, gap = 2, pad = 4;
+    const w = pad * 2 + cols * ps + (cols - 1) * gap;
+    const h = pad * 2 + rows * ps + (rows - 1) * gap;
+    g.appendChild(el('rect', { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: 2,
+      fill: '#0b0f17', stroke: a.color, 'stroke-width': '2', 'vector-effect': 'non-scaling-stroke' }));
+    const x0 = x - w / 2 + pad, y0 = y - h / 2 + pad;
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+      g.appendChild(el('rect', { x: x0 + c * (ps + gap), y: y0 + r * (ps + gap), width: ps, height: ps, rx: 1, fill: a.color }));
+  } else {
+    g.appendChild(el('circle', { cx: x, cy: y, r: '12', fill: '#0b0f17', stroke: a.color, 'stroke-width': '2', 'vector-effect': 'non-scaling-stroke' }));
+    const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '13' });
+    t.textContent = a.icon;
+    g.appendChild(t);
+  }
+  return g;
+}
+
+// label for a group of stacked drops: a range when their numbers are contiguous, else a count
+function stackLabel(drops) {
+  if (drops.length === 1) return drops[0].name;
+  const nums = drops.map(d => { const m = /(\d+)\s*$/.exec(d.name || ''); return m ? +m[1] : null; });
+  if (nums.every(n => n != null)) {
+    const s = [...nums].sort((a, b) => a - b);
+    if (s.every((n, i) => i === 0 || n === s[i - 1] + 1)) return `Drops ${s[0]}–${s[s.length - 1]}`;
+  }
+  return `${drops.length} drops`;
+}
+
+function renderNetwork() {
+  netLayer.innerHTML = '';
+  // cables under nodes — drawn as a polyline through any pivot points
+  for (const c of state.network.cables) {
+    const pts = runPoints(c);
+    if (!pts) continue;
+    const sel = c.id === state.selectionId;
+    const poly = el('polyline', { points: pts.map(p => `${p.x},${p.y}`).join(' '), fill: 'none',
+      stroke: sel ? '#67e8f9' : '#0e7490', 'stroke-width': '2', 'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'vector-effect': 'non-scaling-stroke' });
+    poly.style.cursor = 'pointer';
+    poly.addEventListener('click', (ev) => { if (state.topo.tool === 'select' && !didPan) { ev.stopPropagation(); selectId(c.id); } });
+    netLayer.appendChild(poly);
+    (c.path || []).forEach(w => netLayer.appendChild(el('circle', { cx: w.x, cy: w.y, r: '2.5', fill: sel ? '#67e8f9' : '#0e7490', 'vector-effect': 'non-scaling-stroke' })));
+    const mid = runMidpoint(pts);
+    netLayer.appendChild(labelEl(mid.x, mid.y, fmtLen(runPx(pts)), '#22d3ee'));
+  }
+  // group drops sitting on top of one another so their labels merge into a count/range
+  const STACK_EPS = 8;   // world units — drops closer than this count as "stacked"
+  const stacks = new Map();
+  for (const n of state.network.nodes) if (n.type === 'drop') {
+    const key = `${Math.round(n.x / STACK_EPS)}_${Math.round(n.y / STACK_EPS)}`;
+    (stacks.get(key) || stacks.set(key, []).get(key)).push(n);
+  }
+
+  // node glyphs (drop labels are consolidated per-stack just below)
+  for (const node of state.network.nodes) {
+    if (node.type !== 'drop' && node.name) netLayer.appendChild(labelEl(node.x, node.y + 30, node.name, '#cbd5e1'));
+    const g = glyphFor(node.type, node.x, node.y, node.ports || 1);
+    g.setAttribute('data-node-id', node.id);
+    if (node.id === state.selectionId) { g.firstChild.setAttribute('stroke', '#fff'); g.firstChild.setAttribute('stroke-width', '3'); }
+    g.style.cursor = state.topo.tool === 'select' ? 'move' : 'pointer';
+    g.addEventListener('click', (ev) => { if (state.topo.tool === 'select' && !didPan && !dragMoved) { ev.stopPropagation(); selectId(node.id); } });
+    netLayer.appendChild(g);
+  }
+
+  // one label per drop stack; a count badge when more than one drop is stacked
+  stacks.forEach(arr => {
+    const p = arr[0];
+    netLayer.appendChild(labelEl(p.x, p.y + 30, stackLabel(arr), '#cbd5e1'));
+    if (arr.length > 1) {
+      const bx = p.x + 11, by = p.y - 9;
+      netLayer.appendChild(el('circle', { cx: bx, cy: by, r: '6', fill: '#38bdf8', stroke: '#0b0f17', 'stroke-width': '1.5', 'vector-effect': 'non-scaling-stroke' }));
+      const t = el('text', { x: bx, y: by, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '8', 'font-weight': '700', fill: '#0b0f17' });
+      t.textContent = arr.length; netLayer.appendChild(t);
+    }
+  });
+}
+
+function renderTopoOverlay() {
+  overlayLayer.innerHTML = '';
+  if (state.mode !== 'topology') return;
+  if (state.topo.tool === 'place' && state.topo.pendingAsset) {
+    overlayLayer.appendChild(glyphFor(state.topo.pendingAsset, mouseWorld.x, mouseWorld.y, 1, 0.5));
+    return;
+  }
+  // rubber-band the run-in-progress: source -> any pivots -> cursor
+  if ((state.topo.tool === 'cable' || state.topo.tool === 'path') && state.topo.cableFrom != null) {
+    const a = nodeById(state.topo.cableFrom);
+    if (a) {
+      const pivots = state.topo.tool === 'path' ? state.topo.cablePath : [];
+      const pts = [a, ...pivots, mouseWorld];
+      overlayLayer.appendChild(el('polyline', { points: pts.map(p => `${p.x},${p.y}`).join(' '), fill: 'none',
+        stroke: '#22d3ee', 'stroke-width': '2', 'stroke-dasharray': '5 4', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
+      pivots.forEach(w => overlayLayer.appendChild(el('circle', { cx: w.x, cy: w.y, r: '2.5', fill: '#22d3ee', 'vector-effect': 'non-scaling-stroke' })));
+      const mid = runMidpoint(pts);
+      overlayLayer.appendChild(labelEl(mid.x, mid.y, fmtLen(runPx(pts)), '#67e8f9'));
+    }
+  }
+  // snapped cursor marker for the placement-style tools
+  if (state.topo.tool !== 'select') {
+    overlayLayer.appendChild(el('circle', { cx: mouseWorld.x, cy: mouseWorld.y, r: '3', fill: 'none', stroke: '#22d3ee', 'stroke-width': '1.5', 'vector-effect': 'non-scaling-stroke' }));
+  }
+}
+
+/* ----- topology tool selection ----- */
+const TOPO_HINTS = {
+  select: 'Click an asset to edit it. Drag an asset to move it.',
+  cable:  'Click any device, then another device to run a straight cable · Esc cancels.',
+  path:   'Click a device to start, click open space to drop pivot points along the route, then click the end device · Backspace removes the last pivot · Esc cancels.',
+  place:  'Click on the plan to drop assets. Esc or Select to stop.',
+};
+function refreshTopoButtons() {
+  document.querySelectorAll('#topoTools .ttoolbtn').forEach(b => b.classList.toggle('active', state.topo.tool !== 'place' && b.dataset.ttool === state.topo.tool));
+  document.querySelectorAll('#assetPalette .assetbtn').forEach(b => b.classList.toggle('active', state.topo.tool === 'place' && b.dataset.asset === state.topo.pendingAsset));
+  document.getElementById('topoHint').textContent = TOPO_HINTS[state.topo.tool] || '';
+  svg.style.cursor = state.topo.tool === 'select' ? 'grab' : 'crosshair';
+}
+function setTopoTool(t) {
+  state.topo.tool = t; state.topo.pendingAsset = null; state.topo.cableFrom = null; state.topo.cablePath = [];
+  refreshTopoButtons(); renderAll();
+}
+function armPlace(type) {
+  state.topo.tool = 'place'; state.topo.pendingAsset = type; state.topo.cableFrom = null; state.topo.cablePath = [];
+  refreshTopoButtons(); renderAll();
+}
+document.querySelectorAll('#topoTools .ttoolbtn').forEach(b => b.onclick = () => setTopoTool(b.dataset.ttool));
+document.querySelectorAll('#assetPalette .assetbtn').forEach(b => {
+  b.draggable = true;
+  b.addEventListener('click', () => armPlace(b.dataset.asset));
+  b.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/asset', b.dataset.asset));
+});
+// drag an asset straight from the palette onto the canvas
+svg.addEventListener('dragover', (e) => { if (state.mode === 'topology') e.preventDefault(); });
+svg.addEventListener('drop', (e) => {
+  const type = e.dataTransfer.getData('text/asset');
+  if (state.mode === 'topology' && type) { e.preventDefault(); addNode(type, snapWorld(toWorld(e.clientX, e.clientY))); }
+});
+
+/* ===================================================================
+   PHASE 4 — PROJECT FILE: new / save / open / export
+   =================================================================== */
+function stamp() {
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+function download(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// the persistent project — everything needed to resume editing (no transient UI state)
+function serializeProject() {
+  return {
+    app: 'NetSurvey', version: 1,
+    scale: state.scale,
+    architecture: state.architecture,
+    network: state.network,
+    view: state.view,
+    seq: state._seq,
+  };
+}
+function loadProject(d) {
+  if (!d || d.app !== 'NetSurvey') throw new Error('Not a NetSurvey project file.');
+  pushUndo();
+  state.scale        = d.scale || { pxPerUnit: null, unit: 'ft' };
+  state.architecture = { walls: (d.architecture && d.architecture.walls) || [], dimensions: (d.architecture && d.architecture.dimensions) || [] };
+  state.network      = { nodes: (d.network && d.network.nodes) || [], cables: (d.network && d.network.cables) || [] };
+  state.network.nodes.forEach(n => { if (n.type === 'drop' && n.ports == null) n.ports = 1; });  // migrate older files
+  // keep the id counter ahead of every loaded id so new items never collide
+  const ids = [...state.architecture.walls, ...state.architecture.dimensions, ...state.network.nodes, ...state.network.cables].map(o => o.id);
+  state._seq = Math.max(d.seq || 1, (ids.length ? Math.max(...ids) : 0) + 1);
+  if (d.view) state.view = d.view;
+  state.selectionId = null;
+  state.draft = { wallPoints: [], measure: null, scale: null };
+  state.topo.cableFrom = null;
+  applyView(); renderAll();
+}
+
+function newProject() {
+  if (!confirm('Clear the whole project and start over?')) return;
+  pushUndo();
+  state.scale = { pxPerUnit: null, unit: 'ft' };
+  state.architecture = { walls: [], dimensions: [] };
+  state.network = { nodes: [], cables: [] };
+  state.draft = { wallPoints: [], measure: null, scale: null };
+  state.topo.cableFrom = null;
+  state.selectionId = null;
+  state._seq = 1;
+  resetView(); renderAll();
+}
+
+function saveProject() {
+  download(new Blob([JSON.stringify(serializeProject(), null, 2)], { type: 'application/json' }), `netsurvey-${stamp()}.json`);
+}
+
+function openFromFile(file) {
+  const fr = new FileReader();
+  fr.onload = () => { try { loadProject(JSON.parse(fr.result)); } catch (e) { alert('Could not open that file.\n' + e.message); } };
+  fr.readAsText(file);
+}
+
+// build a standalone, self-contained SVG of the CURRENT view (with a solid background)
+function buildExportSVG() {
+  const r = svg.getBoundingClientRect();
+  const W = Math.round(r.width), H = Math.round(r.height);
+  const defs = svg.querySelector('defs').outerHTML;
+  return { w: W, h: H, str:
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    defs +
+    `<rect width="${W}" height="${H}" fill="#0b0f17"/>` +
+    world.outerHTML +
+    `</svg>` };
+}
+function exportPNG() {
+  const { w, h, str } = buildExportSVG();
+  const url = URL.createObjectURL(new Blob([str], { type: 'image/svg+xml;charset=utf-8' }));
+  const img = new Image();
+  img.onload = () => {
+    const s = 2;                                  // 2x for a crisp proposal image
+    const canvas = document.createElement('canvas');
+    canvas.width = w * s; canvas.height = h * s;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(s, s); ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(b => download(b, `netsurvey-${stamp()}.png`), 'image/png');
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); alert('Sorry — exporting the image failed in this browser.'); };
+  img.src = url;
+}
+
+/* ----- BLACK & WHITE BLUEPRINT EXPORT -----
+   White background, black geometry, no grid/origin — just walls, devices,
+   cables and a printed scale bar. Built by cloning the live `world`, stripping
+   the grid, and recolouring every element to monochrome. */
+function recolorBW(node) {
+  node.querySelectorAll('*').forEach(elm => {
+    if (elm.tagName.toLowerCase() === 'text') {
+      elm.setAttribute('fill', '#000');
+      // give every label a white halo so it stays readable over black fills
+      elm.setAttribute('paint-order', 'stroke');
+      elm.setAttribute('stroke', '#fff');
+      elm.setAttribute('stroke-width', '3');
+      elm.setAttribute('stroke-linejoin', 'round');
+      return;
+    }
+    if (elm.hasAttribute('stroke') && elm.getAttribute('stroke') !== 'none') elm.setAttribute('stroke', '#000');
+    if (elm.hasAttribute('fill')) {
+      const f = elm.getAttribute('fill');
+      if (f === 'none' || /url\(/.test(f)) return;
+      elm.setAttribute('fill', f === '#0b0f17' ? '#fff' : '#000');  // dark fills -> white plate, everything else -> black
+    }
+  });
+}
+
+// round a value down to a tidy 1/2/5 x 10^n step for the scale bar
+function niceNumber(x) {
+  const exp = Math.floor(Math.log10(x)), base = Math.pow(10, exp), f = x / base;
+  const n = f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10;
+  return n * base;
+}
+// a two-segment graphic scale bar in screen space (only meaningful once scale is set)
+function scaleBarSVG(W, H) {
+  if (!state.scale.pxPerUnit) return '';
+  const pps = state.scale.pxPerUnit * state.view.scale;     // screen px per real-world unit
+  const nice = niceNumber(120 / pps);                        // aim for a ~120px bar
+  const half = nice * pps / 2;
+  const x = 24, y = H - 28, h = 8;
+  const fmt = v => (Math.round(v * 100) / 100).toString();
+  const lbl = (tx, s, anchor) => `<text x="${tx}" y="${y - 5}" font-family="ui-sans-serif,system-ui" font-size="11" fill="#000" text-anchor="${anchor}">${s}</text>`;
+  return `<g>` +
+    `<rect x="${x}" y="${y}" width="${half}" height="${h}" fill="#000" stroke="#000"/>` +
+    `<rect x="${x + half}" y="${y}" width="${half}" height="${h}" fill="#fff" stroke="#000"/>` +
+    lbl(x, '0', 'start') +
+    lbl(x + half, fmt(nice / 2), 'middle') +
+    lbl(x + half * 2, `${fmt(nice)} ${state.scale.unit}`, 'middle') +
+    `</g>`;
+}
+function buildBlueprintSVG() {
+  const r = svg.getBoundingClientRect();
+  const W = Math.round(r.width), H = Math.round(r.height);
+  const wclone = world.cloneNode(true);
+  const grid = wclone.querySelector('#grid');     if (grid) grid.remove();
+  const origin = wclone.querySelector('#origin'); if (origin) origin.remove();
+  const ov = wclone.querySelector('#layer-overlay'); if (ov) ov.innerHTML = '';   // drop any live draft preview
+  recolorBW(wclone);
+  return { w: W, h: H, str:
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    `<rect width="${W}" height="${H}" fill="#ffffff"/>` +
+    wclone.outerHTML +
+    scaleBarSVG(W, H) +
+    `</svg>` };
+}
+function exportBlueprintPNG() {
+  const { w, h, str } = buildBlueprintSVG();
+  const url = URL.createObjectURL(new Blob([str], { type: 'image/svg+xml;charset=utf-8' }));
+  const img = new Image();
+  img.onload = () => {
+    const s = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = w * s; canvas.height = h * s;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);   // solid white, no transparency
+    ctx.scale(s, s); ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(b => download(b, `netsurvey-bw-${stamp()}.png`), 'image/png');
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); alert('Sorry — exporting the image failed in this browser.'); };
+  img.src = url;
+}
+
+document.getElementById('btnNew').onclick    = newProject;
+document.getElementById('btnSave').onclick   = saveProject;
+document.getElementById('btnExport').onclick = exportPNG;
+document.getElementById('btnExportBW').onclick = exportBlueprintPNG;
+document.getElementById('btnOpen').onclick   = () => document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange = (e) => { if (e.target.files[0]) openFromFile(e.target.files[0]); e.target.value = ''; };
+
+/* ===================================================================
+   UNDO  — snapshot the editable model before each change
+   =================================================================== */
+const undoStack = [];
+let editSnapped = false;            // one undo step per property-edit session
+function snapshot() {
+  return JSON.stringify({ scale: state.scale, architecture: state.architecture, network: state.network, seq: state._seq, selectionId: state.selectionId });
+}
+function pushUndo() {
+  undoStack.push(snapshot());
+  if (undoStack.length > 50) undoStack.shift();
+  updateUndoBtn();
+}
+function undo() {
+  if (!undoStack.length) return;
+  const s = JSON.parse(undoStack.pop());
+  state.scale = s.scale; state.architecture = s.architecture; state.network = s.network;
+  state._seq = s.seq; state.selectionId = s.selectionId;
+  state.draft = { wallPoints: [], measure: null, scale: null };   // drop any in-progress draw
+  state.topo.cableFrom = null; state.topo.cablePath = [];
+  updateUndoBtn(); renderAll();
+}
+function updateUndoBtn() { const b = document.getElementById('btnUndo'); if (b) b.disabled = undoStack.length === 0; }
+document.getElementById('btnUndo').onclick = undo;
+
+/* ===================================================================
+   BOOT
+   =================================================================== */
+function init() {
+  resetView();          // centre origin in the viewport
+  refreshTopoButtons(); // prime the topology panel (hidden until the mode is opened)
+  updateUndoBtn();
+  setMode('draft');
+  setTool('select');
+}
+addEventListener('resize', applyView);
+init();
+</script>
+</body>
+</html>
