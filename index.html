@@ -972,6 +972,74 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
             </div>
           </div>
 
+          <div id="camera-details" class="cabling-details">
+            <h4>Security camera details (optional)</h4>
+            <p class="help-text">The more we know up front, the more accurate the quote.</p>
+            <div class="row-2">
+              <div>
+                <label class="label" for="cam-property">Commercial or residential?</label>
+                <select class="select" id="cam-property" name="cam-property">
+                  <option value="">Select&hellip;</option>
+                  <option value="Commercial">Commercial</option>
+                  <option value="Residential">Residential</option>
+                </select>
+              </div>
+              <div><label class="label" for="cam-floors">How many floors?</label><input class="input" id="cam-floors" name="cam-floors" type="number" min="0" placeholder="e.g. 2"/></div>
+            </div>
+            <div class="row-2">
+              <div><label class="label" for="cam-sqft">Approx. sq ft</label><input class="input" id="cam-sqft" name="cam-sqft" type="number" min="0" placeholder="e.g. 4000"/></div>
+              <div>
+                <label class="label" for="cam-ceiling">Ceiling type</label>
+                <select class="select" id="cam-ceiling" name="cam-ceiling">
+                  <option value="">Select&hellip;</option>
+                  <option value="Finished / hard lid">Finished / hard lid</option>
+                  <option value="Drop (drop-tile)">Drop ceiling (drop-tile)</option>
+                  <option value="Mixed / not sure">Mixed / not sure</option>
+                </select>
+              </div>
+            </div>
+            <div class="row-2">
+              <div><label class="label" for="cam-count">How many cameras?</label><input class="input" id="cam-count" name="cam-count" type="number" min="0" placeholder="e.g. 8"/></div>
+              <div>
+                <label class="label" for="cam-fullsystem">Full system w/ NVR &amp; switch?</label>
+                <select class="select" id="cam-fullsystem" name="cam-fullsystem">
+                  <option value="">Select&hellip;</option>
+                  <option value="Yes &mdash; need NVR + switch">Yes &mdash; need NVR + switch</option>
+                  <option value="No &mdash; cameras only">No &mdash; cameras only</option>
+                  <option value="Not sure">Not sure</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="label" for="cam-farthest">Farthest camera from the network / modem</label>
+              <input class="input" id="cam-farthest" name="cam-farthest" placeholder="Approx. cable distance, e.g. 250 ft"/>
+            </div>
+          </div>
+
+          <div id="service-details" class="cabling-details">
+            <h4>Service / repair details (optional)</h4>
+            <p class="help-text">The more we know up front, the faster we can help.</p>
+            <div class="row-2">
+              <div>
+                <label class="label" for="svc-property">Commercial or residential?</label>
+                <select class="select" id="svc-property" name="svc-property">
+                  <option value="">Select&hellip;</option>
+                  <option value="Commercial">Commercial</option>
+                  <option value="Residential">Residential</option>
+                </select>
+              </div>
+              <div>
+                <label class="label" for="svc-urgency">How urgent?</label>
+                <select class="select" id="svc-urgency" name="svc-urgency">
+                  <option value="">Select&hellip;</option>
+                  <option value="Emergency — same day">Emergency &mdash; same day</option>
+                  <option value="Urgent — this week">Urgent &mdash; this week</option>
+                  <option value="Standard — flexible">Standard &mdash; flexible</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label class="label" for="lead-description">Tell us about the project</label>
             <textarea class="textarea" id="lead-description" name="description" placeholder="Address, target date, budget if you have one, anything else&hellip;"></textarea>
@@ -1328,13 +1396,13 @@ ready(function () {
   // --- CABLING DETAILS TOGGLE --------------------------------------------
   const serviceSelect = document.getElementById('lead-service');
   const cablingDetails = document.getElementById('cabling-details');
-  if (serviceSelect && cablingDetails) {
+  const cameraDetails = document.getElementById('camera-details');
+  const serviceDetails = document.getElementById('service-details');
+  if (serviceSelect) {
     serviceSelect.addEventListener('change', function () {
-      if (serviceSelect.value === 'STRUCTURED_CABLING') {
-        cablingDetails.classList.add('show');
-      } else {
-        cablingDetails.classList.remove('show');
-      }
+      if (cablingDetails) cablingDetails.classList.toggle('show', serviceSelect.value === 'STRUCTURED_CABLING');
+      if (cameraDetails) cameraDetails.classList.toggle('show', serviceSelect.value === 'VIDEO_SURVEILLANCE');
+      if (serviceDetails) serviceDetails.classList.toggle('show', serviceSelect.value === 'SERVICE_MAINTENANCE');
     });
   }
 
@@ -1384,6 +1452,44 @@ ready(function () {
         if (special) cab.specialRequirements = special;
         if (isNew) cab.isNewConstruction = true;
         if (Object.keys(cab).length > 0) payload.cablingDetails = cab;
+      }
+
+      if (serviceCategory === 'VIDEO_SURVEILLANCE') {
+        const camLines = [];
+        const property = String(fd.get('cam-property') || '').trim();
+        const floors = String(fd.get('cam-floors') || '').trim();
+        const sqft = String(fd.get('cam-sqft') || '').trim();
+        const ceiling = String(fd.get('cam-ceiling') || '').trim();
+        const count = String(fd.get('cam-count') || '').trim();
+        const fullSystem = String(fd.get('cam-fullsystem') || '').trim();
+        const farthest = String(fd.get('cam-farthest') || '').trim();
+        if (property) camLines.push('Property type: ' + property);
+        if (floors) camLines.push('Floors: ' + floors);
+        if (sqft) camLines.push('Approx. sq ft: ' + sqft);
+        if (ceiling) camLines.push('Ceiling type: ' + ceiling);
+        if (count) camLines.push('Cameras: ' + count);
+        if (fullSystem) camLines.push('Full system (NVR + switch): ' + fullSystem);
+        if (farthest) camLines.push('Farthest camera from network/modem: ' + farthest);
+        if (camLines.length > 0) {
+          const block = 'Security camera details:\n' + camLines.join('\n');
+          payload.description = payload.description
+            ? payload.description + '\n\n' + block
+            : block;
+        }
+      }
+
+      if (serviceCategory === 'SERVICE_MAINTENANCE') {
+        const svcLines = [];
+        const property = String(fd.get('svc-property') || '').trim();
+        const urgency = String(fd.get('svc-urgency') || '').trim();
+        if (property) svcLines.push('Property type: ' + property);
+        if (urgency) svcLines.push('Urgency: ' + urgency);
+        if (svcLines.length > 0) {
+          const block = 'Service / repair details:\n' + svcLines.join('\n');
+          payload.description = payload.description
+            ? payload.description + '\n\n' + block
+            : block;
+        }
       }
 
       try {
