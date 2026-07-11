@@ -26,7 +26,7 @@
   #viewport.panning { cursor: grabbing; }
   .seg-active { background:#3b82f6; color:#fff; }
   .toolbtn.active, .ttoolbtn.active, .assetbtn.active { background:#3b82f6; color:#fff; }
-  .tool-btn[disabled] { opacity:.35; cursor:not-allowed; }
+  .toolbtn[disabled], .ttoolbtn[disabled], .assetbtn[disabled] { opacity:.35; cursor:not-allowed; }
   /* thin scrollbars in panels */
   .scroll::-webkit-scrollbar{width:8px;height:8px}
   .scroll::-webkit-scrollbar-thumb{background:#2c3a55;border-radius:4px}
@@ -209,7 +209,7 @@
   <span id="statMode" class="text-accent font-medium">Drafting mode</span>
   <span id="statZoom">100%</span>
   <span id="statCursor">x: 0.0  y: 0.0 (px)</span>
-  <span class="ml-auto text-slate-600">Phase 1 · architecture + canvas</span>
+  <span class="ml-auto text-slate-600">NetSurvey · CRIT Networking</span>
 </footer>
 
 <script>
@@ -390,7 +390,7 @@ svg.addEventListener('pointermove', (e) => {
 
   // redraw live previews (draft rubber-band, or topology ghost/cable)
   if (state.mode === 'topology') renderTopoOverlay();
-  else if (isDrawing()) renderOverlay();
+  else if (state.activeTool !== 'select' || isDrawing()) renderOverlay();
 });
 
 function endPointer(e) {
@@ -705,6 +705,7 @@ function renderProps() {
 
   if (wall) {
     let len = 0; for (let i = 1; i < wall.points.length; i++) len += dist(wall.points[i - 1], wall.points[i]);
+    if (wall.closed && wall.points.length > 2) len += dist(wall.points[wall.points.length - 1], wall.points[0]);
     body.innerHTML =
       `<div class="flex justify-between"><span class="text-slate-400">Type</span><span>Wall</span></div>
        <div class="flex justify-between"><span class="text-slate-400">Vertices</span><span>${wall.points.length}</span></div>
@@ -791,6 +792,7 @@ document.getElementById('scaleSet').onclick = () => {
     pushUndo();
     state.scale.pxPerUnit = dist(seg.a, seg.b) / val;
     state.scale.unit = document.getElementById('scaleUnit').value;
+    state.network.cables.forEach(c => { c.lengthUnits = cableLenUnits(c); });
   }
   state.draft.scale = null; closeScaleModal(); renderAll();
 };
@@ -1081,7 +1083,7 @@ function loadProject(d) {
   if (d.view) state.view = d.view;
   state.selectionId = null;
   state.draft = { wallPoints: [], measure: null, scale: null };
-  state.topo.cableFrom = null;
+  state.topo.cableFrom = null; state.topo.cablePath = [];
   applyView(); renderAll();
 }
 
@@ -1092,7 +1094,7 @@ function newProject() {
   state.architecture = { walls: [], dimensions: [] };
   state.network = { nodes: [], cables: [] };
   state.draft = { wallPoints: [], measure: null, scale: null };
-  state.topo.cableFrom = null;
+  state.topo.cableFrom = null; state.topo.cablePath = [];
   state.selectionId = null;
   state._seq = 1;
   resetView(); renderAll();

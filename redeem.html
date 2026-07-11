@@ -4,6 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Redeem your coupon — CRIT Networking</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='6' fill='%2306101F'/%3E%3Cpolygon points='18,4 30,11 30,25 18,32 6,25 6,11' fill='none' stroke='%23F2C84B' stroke-width='2'/%3E%3Ccircle cx='18' cy='18' r='2.5' fill='%23F2C84B'/%3E%3C/svg%3E"/>
 <meta name="description" content="Redeem your CRIT Networking promo code. Book a free service — WiFi survey, network drop check, or closet grading — in seconds."/>
 <link rel="canonical" href="https://critlv.com/redeem.html"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -176,7 +177,7 @@ footer a { color: var(--cyan); }
         <label for="code">Your coupon code</label>
         <input type="text" id="code" name="code" class="code-input" autocapitalize="characters" placeholder="GRAND42" maxlength="32" required autofocus/>
         <div class="hint">Type it exactly as you received it.</div>
-        <div id="code-error" class="alert error" hidden></div>
+        <div id="code-error" class="alert error" role="alert" hidden></div>
         <button type="submit" id="btn-check" class="btn btn-primary" style="margin-top:18px;">Check code</button>
       </form>
     </section>
@@ -231,7 +232,7 @@ footer a { color: var(--cyan); }
         </div>
         <div id="slots-loading" class="hint"><span class="spinner"></span> &nbsp;Loading available times…</div>
         <div id="slots-empty" hidden class="alert info">We don&rsquo;t have any open slots in the next two weeks. Email us at <a href="mailto:critnetworking@gmail.com" style="color:var(--cyan);">critnetworking@gmail.com</a> and we&rsquo;ll find something off the books.</div>
-        <div id="slots-error" hidden class="alert error"></div>
+        <div id="slots-error" hidden class="alert error" role="alert"></div>
         <div id="slots-container"></div>
         <div class="hint" id="slot-tz-note" hidden style="margin-top:12px;">All times are Eastern (your local time may differ).</div>
       </div>
@@ -262,7 +263,7 @@ footer a { color: var(--cyan); }
             <textarea id="note" name="note" placeholder="Gate code, building access, what's on your mind…" maxlength="500"></textarea>
           </div>
 
-          <div id="book-error" class="alert error" hidden></div>
+          <div id="book-error" class="alert error" role="alert" hidden></div>
 
           <button type="submit" id="btn-book" class="btn btn-primary" disabled>Pick a time above first</button>
         </form>
@@ -347,6 +348,7 @@ footer a { color: var(--cyan); }
     if (anyBatch) {
       validCode = null;
       pickedSlot = null;
+      resetBookBtn();
       hide("step-book");
       show("step-pick");
     } else {
@@ -356,10 +358,17 @@ footer a { color: var(--cyan); }
 
   $("btn-back-to-code-from-pick").addEventListener("click", resetToCode);
 
+  function resetBookBtn() {
+    const bookBtn = $("btn-book");
+    bookBtn.disabled = true;
+    bookBtn.textContent = "Pick a time above first";
+  }
+
   function resetToCode() {
     validCode = null;
     anyBatch = null;
     pickedSlot = null;
+    resetBookBtn();
     hide("step-pick");
     hide("step-book");
     show("step-code");
@@ -533,7 +542,7 @@ footer a { color: var(--cyan); }
       if (!res.ok || !json.data) throw new Error(json.error || "Booking failed.");
 
       const slotLabel = new Date(json.data.scheduledFor).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "full", timeStyle: "short" });
-      $("done-meta").innerHTML = `${json.data.rewardLabel} &middot; <span class="code-pill">${validCode.code}</span><br>${slotLabel} ET`;
+      $("done-meta").innerHTML = `${escapeHtml(json.data.rewardLabel)} &middot; <span class="code-pill">${escapeHtml(validCode.code)}</span><br>${slotLabel} ET`;
       hide("step-book");
       show("step-done");
       // Scroll to top so users see the confirmation immediately.

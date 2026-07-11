@@ -4,6 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Careers at CRIT Networking — Get Paid to Learn the Trade</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='6' fill='%2306101F'/%3E%3Cpolygon points='18,4 30,11 30,25 18,32 6,25 6,11' fill='none' stroke='%23F2C84B' stroke-width='2'/%3E%3Ccircle cx='18' cy='18' r='2.5' fill='%23F2C84B'/%3E%3C/svg%3E"/>
 <meta name="description" content="Entry-level field roles in the Raleigh Triangle. We train you in low-voltage cabling, smart-home, and security camera work. Starting $15/hr, grows to $35/hr. No experience required."/>
 <link rel="canonical" href="https://critlv.com/careers.html"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -125,7 +126,7 @@ footer { padding: 64px 0 32px; background: var(--bg-2); border-top: 1px solid va
 .footer-bot { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
 
 @media (max-width: 980px) {
-  .nav-links { display: none; flex-direction: column; align-items: stretch; gap: 0; position: fixed; top: 73px; left: 0; right: 0; background: rgba(6, 16, 31, 0.98); backdrop-filter: blur(12px); padding: 16px 32px 24px; border-bottom: 1px solid var(--line); }
+  .nav-links { display: none; flex-direction: column; align-items: stretch; gap: 0; position: fixed; top: 73px; left: 0; right: 0; max-height: calc(100vh - 73px); overflow-y: auto; background: rgba(6, 16, 31, 0.98); backdrop-filter: blur(12px); padding: 16px 32px 24px; border-bottom: 1px solid var(--line); }
   body.nav-open .nav-links { display: flex; }
   .nav-links a { padding: 14px 0; border-bottom: 1px solid var(--line); }
   .nav-toggle { display: inline-flex; }
@@ -137,6 +138,7 @@ footer { padding: 64px 0 32px; background: var(--bg-2); border-top: 1px solid va
 @media (max-width: 640px) {
   .container { padding: 0 20px; }
   .nav-inner { padding: 16px 20px; }
+  .nav-links { top: 69px; max-height: calc(100vh - 69px); }
   .hero { padding: 56px 0 56px; }
   .section { padding: 56px 0; }
   .apply-card { padding: 36px 24px; }
