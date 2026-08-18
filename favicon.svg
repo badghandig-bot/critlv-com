@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 36 36">
+  <title>CRIT Networking</title>
+  <rect width="36" height="36" rx="6" fill="#06101F"/>
+  <polygon
+    points="18,4 30,11 30,25 18,32 6,25 6,11"
+    fill="none"
+    stroke="#F2C84B"
+    stroke-width="2"
+  />
+  <circle cx="18" cy="18" r="2.5" fill="#F2C84B"/>
+</svg>
