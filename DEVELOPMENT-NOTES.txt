@@ -1,0 +1,13 @@
+CRIT NETWORK ENGINEERING SERVICES - DEVELOPMENT SNAPSHOT
+
+Save-only development work. Do not merge or publish until the main-site source is identified.
+
+The new network-engineering.html page and capability PDF extend the existing cabling brand with network assessments, refreshes, scoped migrations and automation.
+
+The specialist description uses skills and customer benefits only. It omits former work titles and employers.
+
+The canonical critnetworking.com website publishes from a different GitHub repository that has not yet been identified. This repository's main branch serves the legacy-domain redirect. Preserve its redirect configuration.
+
+When resuming, locate the canonical site's repository and port the five website update files there. The private prospect tracker is kept separately and must not be uploaded with the public website.
+
+Prepared November 3, 2026.
