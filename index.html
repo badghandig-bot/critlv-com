@@ -353,6 +353,13 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
   .ticker-track { animation: none; }
   .pill .dot { animation: none; }
 }
+
+.engineering-feature{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:58px 0}
+.engineering-feature-inner{display:flex;align-items:center;justify-content:space-between;gap:40px}
+.engineering-feature h2{font-size:clamp(28px,3vw,40px);margin-bottom:18px}
+.engineering-feature p{color:var(--ink-2);max-width:700px;font-size:15px;margin:0}
+@media(max-width:1180px){.nav-links{gap:15px}.engineering-feature-inner{align-items:flex-start;flex-direction:column;gap:24px}}
+
 </style>
 </head>
 <body>
@@ -384,6 +391,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
     </a>
     <div class="nav-links">
       <a href="#services">Services</a>
+      <a href="/network-engineering.html">Engineering</a>
       <a href="#process">Process</a>
       <a href="#industries">Industries</a>
       <a href="#projects">Projects</a>
@@ -631,6 +639,16 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
       </div>
 
     </div>
+  </div>
+</section>
+
+
+<section class="engineering-feature" aria-labelledby="engineering-title">
+  <div class="container engineering-feature-inner">
+    <div><div class="eyebrow">Network Engineering &amp; Infrastructure Services</div>
+    <h2 id="engineering-title">The cabling. The configuration.<br>The coordinated cutover.</h2>
+    <p>Network assessments, switch and Wi-Fi upgrades, server migrations and Linux administration, combining an engineering lead with CRIT's onsite installation team.</p></div>
+    <a class="btn btn-primary" href="/network-engineering.html">Explore network engineering &rarr;</a>
   </div>
 </section>
 
@@ -944,7 +962,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
               <option value="AV_PAGING">AV / paging</option>
               <option value="NEW_CONSTRUCTION">New construction low-voltage</option>
               <option value="SERVICE_MAINTENANCE">Service / repair on existing system</option>
-              <option value="SITE_WALK">A full project &mdash; or just a site walk to discuss</option>
+              <option value="SITE_WALK">Network project / site assessment / full project</option>
               <option value="OTHER">Other / not sure yet</option>
             </select>
           </div>
@@ -1226,6 +1244,7 @@ footer { background: var(--bg-2); border-top: 1px solid var(--line); padding: 64
         <a href="#services">Smart Home &amp; IoT</a>
         <a href="#services">AV Cabling</a>
         <a href="#services">Network Closets</a>
+        <a href="/network-engineering.html">Network Engineering</a>
       </div>
       <div class="footer-col">
         <h5>Company</h5>
@@ -1441,6 +1460,23 @@ ready(function () {
       if (cameraDetails) cameraDetails.classList.toggle('show', serviceSelect.value === 'VIDEO_SURVEILLANCE');
       if (serviceDetails) serviceDetails.classList.toggle('show', serviceSelect.value === 'SERVICE_MAINTENANCE');
     });
+  }
+
+
+  // Carry a specific engineering request into the existing project intake.
+  const engineeringProjects = {
+    'network-assessment': 'Network Assessment & Upgrade Plan',
+    'network-refresh': 'Network Refresh & Cutover',
+    'server-linux': 'Server Migration / Linux Administration'
+  };
+  const engineeringProject = new URLSearchParams(window.location.search).get('project');
+  if (Object.prototype.hasOwnProperty.call(engineeringProjects, engineeringProject)) {
+    const projectService = document.getElementById('lead-service');
+    const projectDescription = document.getElementById('lead-description');
+    if (projectService) projectService.value = 'SITE_WALK';
+    if (projectDescription && !projectDescription.value.trim()) {
+      projectDescription.value = engineeringProjects[engineeringProject] + '\n\nLocation(s): \nIssue or planned change: \nTarget timing: ';
+    }
   }
 
   // --- LEAD FORM SUBMIT --------------------------------------------------
