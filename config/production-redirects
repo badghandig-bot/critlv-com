@@ -1,0 +1,11 @@
+# Canonical marketing site only. Never copy the legacy root catch-all here.
+/index.html / 301
+/careers.html /careers 301
+/what-we-offer.html /what-we-offer 301
+/structured-cabling-raleigh.html /structured-cabling-raleigh 301
+/security-camera-installation-raleigh.html /security-camera-installation-raleigh 301
+/wifi-access-point-installation-raleigh.html /wifi-access-point-installation-raleigh 301
+/network-rack-installation-raleigh.html /network-rack-installation-raleigh 301
+/privacy.html /privacy 301
+/redeem.html /redeem 301
+/netsurvey.html /netsurvey 301

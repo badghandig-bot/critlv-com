@@ -4,3 +4,9 @@
 !.dev.vars.example
 .env*
 !.env.example
+
+# Local build and verification outputs
+dist/
+node_modules/
+.openai/
+*.log

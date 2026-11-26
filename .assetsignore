@@ -3,3 +3,15 @@
 node_modules/
 .gitignore
 wrangler.jsonc
+
+# These files are never public assets, including on the legacy Worker.
+scripts/
+tests/
+docs/
+config/
+dist/
+.openai/
+package.json
+package-lock.json
+wrangler.critnetworking.jsonc
+README.md
