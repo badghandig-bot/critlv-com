@@ -1,0 +1,11 @@
+{
+  "name": "critnetworking-marketing",
+  "version": "1.1.0",
+  "private": true,
+  "description": "CRIT Networking public marketing website",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "dev": "node scripts/dev-server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}
